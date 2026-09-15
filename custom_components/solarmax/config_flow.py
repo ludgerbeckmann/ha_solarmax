@@ -10,7 +10,6 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.core import callback
-
 from .configuration import (
     OPTION_DEFAULTS,
     TCP_PORT_SCHEMA,
@@ -44,9 +43,7 @@ from .const import (
     DEFAULT_VERIFY_CHECKSUM,
     DOMAIN,
 )
-
 _LOGGER = logging.getLogger(__name__)
-
 # Default field values for a fresh config entry. The options flow overlays the
 # entry's current values on top of these before building its schema.
 _DEFAULT_VALUES: dict[str, Any] = {
@@ -134,9 +131,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             host = data[CONF_HOST]
             port = data[CONF_PORT]
             address = data[CONF_ADDRESS]
-
             async with configuration_mutation_lock(self.hass):
-                if find_endpoint_conflict(self.hass, host, port) is not None:
+                if find_endpoint_conflict(self.hass, host, port, address) is not None:
                     return self.async_abort(reason="already_configured")
                 await self.async_set_unique_id(endpoint_unique_id(host, port, address))
                 self._abort_if_unique_id_configured()
@@ -153,12 +149,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     _LOGGER.exception("Unexpected exception")
                     errors["base"] = "unknown"
                 else:
-                    if find_endpoint_conflict(self.hass, host, port) is not None:
+                    if find_endpoint_conflict(self.hass, host, port, address) is not None:
                         return self.async_abort(reason="already_configured")
                     return self.async_create_entry(
                         title=data[CONF_DEVICE_NAME], data=data, options=options
                     )
-
         return self.async_show_form(
             step_id="user",
             data_schema=_build_schema(_DEFAULT_VALUES),
@@ -180,7 +175,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     errors["base"] = "cannot_connect"
                 except EntryReloadError:
                     errors["base"] = "reload_failed"
-
         values = (
             _DEFAULT_VALUES | dict(entry.data) if user_input is None else user_input
         )
@@ -221,9 +215,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
                 update_device_name(self.hass, entry.entry_id, name)
             return self.async_abort(reason="reconfigure_successful")
-
         if find_endpoint_conflict(
-            self.hass, host, port, exclude_entry_id=entry.entry_id
+            self.hass, host, port, address, exclude_entry_id=entry.entry_id
         ):
             return self.async_abort(reason="already_configured")
         async with validation_handoff(entry):
@@ -237,7 +230,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
         # Release the engine poll lock before unload closes that engine.
         if find_endpoint_conflict(
-            self.hass, host, port, exclude_entry_id=entry.entry_id
+            self.hass, host, port, address, exclude_entry_id=entry.entry_id
         ):
             return self.async_abort(reason="already_configured")
         await async_apply_and_reload(
@@ -281,7 +274,6 @@ class OptionsFlow(config_entries.OptionsFlow):
                     errors["base"] = "reload_failed"
                 else:
                     return self.async_create_entry(title="", data=user_input)
-
         values = {
             key: entry_option(self.config_entry, key, default)
             for key, default in OPTION_DEFAULTS.items()

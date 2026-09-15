@@ -8,13 +8,11 @@ from collections.abc import AsyncIterator, Mapping
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any, Self
-
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
-
 from .connection import LinkClosed, LinkTimeout, SolarmaxLink
 from .const import (
     CONF_ADDRESS,
@@ -33,10 +31,8 @@ from .const import (
     DOMAIN,
 )
 from .protocol import ProtocolError, build_request, parse_response
-
 _CONFIGURATION_LOCK = "configuration_mutation_lock"
 _LOGGER = logging.getLogger(__name__)
-
 TCP_PORT_SCHEMA = vol.All(vol.Coerce(int), vol.Range(min=1, max=65535))
 CONNECTION_KEYS = (CONF_HOST, CONF_PORT, CONF_ADDRESS, CONF_DEVICE_NAME)
 OPTION_KEYS = (
@@ -51,7 +47,6 @@ OPTION_DEFAULTS = {
     CONF_TWILIGHT_ELEVATION_THRESHOLD: DEFAULT_TWILIGHT_ELEVATION_THRESHOLD,
     CONF_NIGHT_KEEP_VALUES: DEFAULT_NIGHT_KEEP_VALUES,
 }
-
 
 class CannotConnect(HomeAssistantError):
     """The selected endpoint did not return a valid PAC response."""
@@ -69,7 +64,6 @@ class EntrySnapshot:
     options: dict[str, Any]
     title: str
     unique_id: str | None
-
     @classmethod
     def capture(cls, entry: ConfigEntry) -> Self:
         """Copy persisted values before mutation."""
@@ -123,7 +117,6 @@ async def _apply_reload_or_rollback(
         return
     if await _reload_entry(hass, entry):
         return
-
     hass.config_entries.async_update_entry(
         entry,
         data=previous.data,
@@ -188,10 +181,11 @@ def find_endpoint_conflict(
     hass: HomeAssistant,
     host: str,
     port: int,
+    address: int,
     *,
     exclude_entry_id: str | None = None,
 ) -> ConfigEntry | None:
-    """Return an entry that already owns the host and port."""
+    """Return an entry that already owns the host, port and inverter address."""
     return next(
         (
             entry
@@ -199,6 +193,7 @@ def find_endpoint_conflict(
             if entry.entry_id != exclude_entry_id
             and entry.data.get(CONF_HOST) == host
             and entry.data.get(CONF_PORT, DEFAULT_PORT) == port
+            and entry.data.get(CONF_ADDRESS, 1) == address
         ),
         None,
     )
