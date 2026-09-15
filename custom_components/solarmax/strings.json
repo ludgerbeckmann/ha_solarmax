@@ -1,0 +1,362 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Solarmax Inverter",
+        "description": "Set up your Solarmax inverter",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "address": "Inverter address (1-249)",
+          "update_interval": "Update interval (seconds)",
+          "device_name": "Device name",
+          "verify_checksum": "Verify response checksum",
+          "night_keep_values": "Keep sensor values overnight",
+          "twilight_elevation_threshold": "Twilight elevation threshold (degrees)"
+        },
+        "data_description": {
+          "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling)."
+        }
+      },
+      "reconfigure": {
+        "title": "Change inverter connection",
+        "description": "The inverter must be reachable to save connection changes.",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "address": "Inverter address (1-249)",
+          "device_name": "Device name"
+        },
+        "data_description": {
+          "host": "IP address or host name of the inverter.",
+          "port": "MaxComm TCP port used by the inverter.",
+          "address": "MaxComm address assigned to the inverter.",
+          "device_name": "Name shown for the device in Home Assistant."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to inverter",
+      "invalid_host": "Invalid host address",
+      "timeout": "Connection timeout",
+      "unknown": "Unexpected error occurred",
+      "reload_failed": "Home Assistant could not activate the new connection. The previous settings were restored."
+    },
+    "abort": {
+      "already_configured": "This inverter is already configured",
+      "reconfigure_successful": "The inverter configuration was updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Solarmax Inverter Options",
+        "description": "Change polling and sensor preferences.",
+        "data": {
+          "update_interval": "Update interval (seconds)",
+          "verify_checksum": "Verify response checksum",
+          "night_keep_values": "Keep sensor values overnight",
+          "twilight_elevation_threshold": "Twilight elevation threshold (degrees)"
+        },
+        "data_description": {
+          "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling)."
+        }
+      }
+    },
+    "error": {
+      "reload_failed": "Home Assistant could not activate the new connection. The previous settings were restored."
+    }
+  },
+  "issues": {
+    "connection_issues": {
+      "title": "Inverter Connection Issues",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Repair inverter connection",
+            "description": "The inverter at {host}:{port} has been unreachable for {minutes} minutes during daytime. Update the host or port to test another connection.",
+            "data": {
+              "host": "Host",
+              "port": "Port"
+            }
+          }
+        },
+        "error": {
+          "cannot_connect": "Failed to connect to inverter",
+          "unknown": "An unexpected error occurred while testing the connection.",
+          "reload_failed": "Home Assistant could not activate the new connection. The previous settings were restored."
+        },
+        "abort": {
+          "entry_missing": "The integration entry no longer exists.",
+          "already_configured": "Another inverter entry already uses this connection.",
+          "repair_pending_verification": "Connection saved. The repair stays open until a full inverter update succeeds.",
+          "issue_missing": "The repair issue no longer exists."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "pac": {
+        "name": "AC Power"
+      },
+      "pdc": {
+        "name": "DC Power"
+      },
+      "pd01": {
+        "name": "DC Power String 1"
+      },
+      "pd02": {
+        "name": "DC Power String 2"
+      },
+      "pd03": {
+        "name": "DC Power String 3"
+      },
+      "ul1": {
+        "name": "AC Voltage Phase 1"
+      },
+      "ul2": {
+        "name": "AC Voltage Phase 2"
+      },
+      "ul3": {
+        "name": "AC Voltage Phase 3"
+      },
+      "udc": {
+        "name": "DC Voltage"
+      },
+      "ud01": {
+        "name": "DC Voltage String 1"
+      },
+      "ud02": {
+        "name": "DC Voltage String 2"
+      },
+      "ud03": {
+        "name": "DC Voltage String 3"
+      },
+      "il1": {
+        "name": "AC Current Phase 1"
+      },
+      "il2": {
+        "name": "AC Current Phase 2"
+      },
+      "il3": {
+        "name": "AC Current Phase 3"
+      },
+      "idc": {
+        "name": "DC Current"
+      },
+      "id01": {
+        "name": "DC Current String 1"
+      },
+      "id02": {
+        "name": "DC Current String 2"
+      },
+      "id03": {
+        "name": "DC Current String 3"
+      },
+      "kdy": {
+        "name": "Energy Day"
+      },
+      "kmt": {
+        "name": "Energy Month"
+      },
+      "kyr": {
+        "name": "Energy Year"
+      },
+      "kt0": {
+        "name": "Energy Total"
+      },
+      "kld": {
+        "name": "Energy Yesterday"
+      },
+      "klm": {
+        "name": "Energy Last Month"
+      },
+      "kly": {
+        "name": "Energy Last Year"
+      },
+      "tkk": {
+        "name": "Inverter Temperature"
+      },
+      "tk2": {
+        "name": "Inverter Temperature 2"
+      },
+      "tk3": {
+        "name": "Inverter Temperature 3"
+      },
+      "khr": {
+        "name": "Power On Hours"
+      },
+      "cac": {
+        "name": "Startups"
+      },
+      "prl": {
+        "name": "Relative Power"
+      },
+      "pin": {
+        "name": "Installed Power"
+      },
+      "tnf": {
+        "name": "Grid Frequency"
+      },
+      "ulh": {
+        "name": "Grid Voltage Upper Limit"
+      },
+      "ull": {
+        "name": "Grid Voltage Lower Limit"
+      },
+      "tnh": {
+        "name": "Grid Frequency Upper Limit"
+      },
+      "tnl": {
+        "name": "Grid Frequency Lower Limit"
+      },
+      "sys": {
+        "name": "Status Code",
+        "state": {
+          "no_communication": "No communication",
+          "in_operation": "In operation",
+          "low_irradiation": "Low irradiation",
+          "starting_up": "Starting up",
+          "mpp_operation": "MPP operation",
+          "fan_running": "Fan running",
+          "max_power_operation": "Maximum power operation",
+          "temperature_limitation": "Temperature limitation",
+          "grid_operation": "Grid operation",
+          "dc_current_limited": "DC current limited",
+          "ac_current_limited": "AC current limited",
+          "test_mode": "Test mode",
+          "remote_controlled": "Remote controlled",
+          "start_delay": "Start delay",
+          "external_limitation": "External limitation",
+          "frequency_limitation": "Frequency limitation",
+          "restart_limitation": "Restart limitation",
+          "booting": "Booting",
+          "insufficient_boot_power": "Insufficient boot power",
+          "insufficient_power": "Insufficient power",
+          "uninitialized": "Uninitialized",
+          "disabled": "Disabled",
+          "idle": "Idle",
+          "powerunit_not_ready": "Power unit not ready",
+          "program_firmware": "Programming firmware",
+          "device_error_101": "Device error 101",
+          "device_error_102": "Device error 102",
+          "device_error_103": "Device error 103",
+          "device_error_104": "Device error 104",
+          "insulation_fault_dc": "Insulation fault DC",
+          "insulation_fault_dc_2": "Insulation fault DC (2)",
+          "device_error_107": "Device error 107",
+          "device_error_108": "Device error 108",
+          "vdc_too_high": "DC voltage too high",
+          "device_error_110": "Device error 110",
+          "device_error_111": "Device error 111",
+          "device_error_112": "Device error 112",
+          "device_error_113": "Device error 113",
+          "leakage_current_high": "Leakage current too high",
+          "no_grid": "No grid",
+          "grid_frequency_high": "Grid frequency too high",
+          "grid_frequency_low": "Grid frequency too low",
+          "mains_error": "Mains error",
+          "vac_10min_too_high": "AC voltage 10min too high",
+          "device_error_120": "Device error 120",
+          "device_error_121": "Device error 121",
+          "grid_voltage_high": "Grid voltage too high",
+          "grid_voltage_low": "Grid voltage too low",
+          "temperature_too_high": "Temperature too high",
+          "grid_current_asymmetric": "Grid current asymmetric",
+          "external_input_error_1": "External input error 1",
+          "external_input_error_2": "External input error 2",
+          "device_error_128": "Device error 128",
+          "incorrect_rotation": "Incorrect rotation direction",
+          "wrong_device_type": "Wrong device type",
+          "main_switch_off": "Main switch off",
+          "diode_overtemperature": "Diode overtemperature",
+          "device_error_133": "Device error 133",
+          "fan_defective": "Fan defective",
+          "device_error_135": "Device error 135",
+          "device_error_136": "Device error 136",
+          "device_error_137": "Device error 137",
+          "device_error_138": "Device error 138",
+          "device_error_139": "Device error 139",
+          "device_error_140": "Device error 140",
+          "device_error_141": "Device error 141",
+          "device_error_142": "Device error 142",
+          "device_error_143": "Device error 143",
+          "device_error_144": "Device error 144",
+          "dfdt_too_high": "df/dt too high",
+          "device_error_146": "Device error 146",
+          "device_error_147": "Device error 147",
+          "device_error_148": "Device error 148",
+          "ierr_step_too_high": "Ierr step too high",
+          "ierr_step_too_high_2": "Ierr step too high (2)",
+          "device_error_153": "Device error 153",
+          "shutdown_1": "Shutdown 1",
+          "shutdown_2": "Shutdown 2",
+          "device_error_156": "Device error 156",
+          "insulation_fault_dc_3": "Insulation fault DC (3)",
+          "device_error_158": "Device error 158",
+          "device_error_159": "Device error 159",
+          "device_error_160": "Device error 160",
+          "device_error_161": "Device error 161",
+          "device_error_163": "Device error 163",
+          "ierr_too_high_2": "Ierr too high (2)",
+          "no_mains_2": "No mains (2)",
+          "frequency_too_high_2": "Frequency too high (2)",
+          "frequency_too_low_2": "Frequency too low (2)",
+          "mains_error_2": "Mains error (2)",
+          "vac_10min_too_high_2": "AC voltage 10min too high (2)",
+          "device_error_170": "Device error 170",
+          "device_error_171": "Device error 171",
+          "vac_too_high_2": "AC voltage too high (2)",
+          "vac_too_low_2": "AC voltage too low (2)",
+          "device_error_174": "Device error 174",
+          "device_error_175": "Device error 175",
+          "error_dc_polarity": "Error DC polarity",
+          "device_error_177": "Device error 177",
+          "device_error_178": "Device error 178",
+          "device_error_179": "Device error 179",
+          "vdc_too_low": "DC voltage too low",
+          "blocked_external": "Blocked external",
+          "device_error_185": "Device error 185",
+          "device_error_186": "Device error 186",
+          "device_error_187": "Device error 187",
+          "device_error_188": "Device error 188",
+          "l_n_interchanged": "L and N interchanged",
+          "below_average_yield": "Below-average yield",
+          "limitation_error": "Limitation error",
+          "device_error_198": "Device error 198",
+          "device_error_199": "Device error 199",
+          "device_error_999": "Device error 999",
+          "offline_expected": "Offline (expected)",
+          "offline_fault": "Offline (fault)",
+          "unknown": "Unknown"
+        }
+      },
+      "sal": {
+        "name": "Alarm Status",
+        "state": {
+          "no_error": "No error",
+          "external_fault_1": "External fault 1",
+          "insulation_fault_dc": "Insulation fault DC side",
+          "earth_fault_current": "Earth fault current too high",
+          "fuse_break_center_earth": "Fuse break center earth",
+          "external_alarm_2": "External alarm 2",
+          "long_term_temp_limit": "Long-term temperature limitation",
+          "ac_feed_in_error": "AC feed-in error",
+          "external_alarm_4": "External alarm 4",
+          "fan_defect": "Fan defect",
+          "fuse_break": "Fuse break",
+          "temp_sensor_failure": "Temperature sensor failure",
+          "alarm_12": "Alarm 12",
+          "alarm_13": "Alarm 13",
+          "alarm_14": "Alarm 14",
+          "alarm_15": "Alarm 15",
+          "alarm_16": "Alarm 16",
+          "alarm_17": "Alarm 17",
+          "multiple_alarms": "Multiple alarms",
+          "unknown_alarm": "Unknown alarm"
+        }
+      }
+    }
+  }
+}

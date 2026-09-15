@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+if [[ -x .venv/bin/python ]]; then
+    python_cmd=.venv/bin/python
+else
+    python_cmd=python
+fi
+
+"$python_cmd" -m pre_commit run --all-files --show-diff-on-failure
+"$python_cmd" -m mypy custom_components/solarmax
+
+pytest_args=(tests/ --cov=custom_components/solarmax)
+if [[ -n "${CI_REPORT_DIR:-}" ]]; then
+    mkdir -p "$CI_REPORT_DIR"
+    pytest_args+=(
+        "--cov-report=xml:$CI_REPORT_DIR/coverage.xml"
+        "--junitxml=$CI_REPORT_DIR/junit.xml"
+    )
+fi
+
+"$python_cmd" -m pytest "${pytest_args[@]}"

@@ -1,0 +1,362 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Onduleur Solarmax",
+        "description": "Configurer votre onduleur Solarmax",
+        "data": {
+          "host": "Hôte",
+          "port": "Port",
+          "address": "Adresse de l'onduleur (1-249)",
+          "update_interval": "Intervalle de mise à jour (secondes)",
+          "device_name": "Nom de l'appareil",
+          "verify_checksum": "Vérifier le checksum de la réponse",
+          "night_keep_values": "Conserver les valeurs des capteurs la nuit",
+          "twilight_elevation_threshold": "Seuil d'élévation crépusculaire (degrés)"
+        },
+        "data_description": {
+          "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube)."
+        }
+      },
+      "reconfigure": {
+        "title": "Modifier la connexion de l'onduleur",
+        "description": "L'onduleur doit être accessible pour enregistrer les modifications de connexion.",
+        "data": {
+          "host": "Hôte",
+          "port": "Port",
+          "address": "Adresse de l'onduleur (1-249)",
+          "device_name": "Nom de l'appareil"
+        },
+        "data_description": {
+          "host": "Adresse IP ou nom d'hôte de l'onduleur.",
+          "port": "Port TCP MaxComm utilisé par l'onduleur.",
+          "address": "Adresse MaxComm attribuée à l'onduleur.",
+          "device_name": "Nom de l'appareil affiché dans Home Assistant."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossible de se connecter à l'onduleur",
+      "invalid_host": "Adresse hôte invalide",
+      "timeout": "Délai de connexion dépassé",
+      "unknown": "Une erreur inattendue s'est produite",
+      "reload_failed": "Home Assistant n'a pas pu activer la nouvelle connexion. Les paramètres précédents ont été restaurés."
+    },
+    "abort": {
+      "already_configured": "L'appareil est déjà configuré",
+      "reconfigure_successful": "La configuration de l'onduleur a été mise à jour."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options de l'onduleur Solarmax",
+        "description": "Modifiez les préférences d'interrogation et des capteurs.",
+        "data": {
+          "update_interval": "Intervalle de mise à jour (secondes)",
+          "twilight_elevation_threshold": "Seuil d'élévation crépusculaire (degrés)",
+          "verify_checksum": "Vérifier la somme de contrôle de la réponse",
+          "night_keep_values": "Conserver les valeurs des capteurs la nuit"
+        },
+        "data_description": {
+          "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube)."
+        }
+      }
+    },
+    "error": {
+      "reload_failed": "Home Assistant n'a pas pu activer la nouvelle connexion. Les paramètres précédents ont été restaurés."
+    }
+  },
+  "issues": {
+    "connection_issues": {
+      "title": "Problèmes de connexion de l'onduleur",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Réparer la connexion de l'onduleur",
+            "description": "L'onduleur à {host}:{port} est inaccessible depuis {minutes} minutes en journée. Modifiez l'hôte ou le port pour tester une autre connexion.",
+            "data": {
+              "host": "Hôte",
+              "port": "Port"
+            }
+          }
+        },
+        "error": {
+          "cannot_connect": "Impossible de se connecter à l'onduleur",
+          "unknown": "Une erreur inattendue s'est produite pendant le test de connexion.",
+          "reload_failed": "Home Assistant n'a pas pu activer la nouvelle connexion. Les paramètres précédents ont été restaurés."
+        },
+        "abort": {
+          "entry_missing": "L'entrée d'intégration n'existe plus.",
+          "already_configured": "Une autre entrée d'onduleur utilise déjà cette connexion.",
+          "repair_pending_verification": "Connexion enregistrée. La réparation reste ouverte jusqu'à la réussite d'une mise à jour complète de l'onduleur.",
+          "issue_missing": "Le problème de réparation n'existe plus."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "pac": {
+        "name": "Puissance AC"
+      },
+      "pdc": {
+        "name": "Puissance DC"
+      },
+      "pd01": {
+        "name": "Puissance DC String 1"
+      },
+      "pd02": {
+        "name": "Puissance DC String 2"
+      },
+      "pd03": {
+        "name": "Puissance DC String 3"
+      },
+      "ul1": {
+        "name": "Tension AC Phase 1"
+      },
+      "ul2": {
+        "name": "Tension AC Phase 2"
+      },
+      "ul3": {
+        "name": "Tension AC Phase 3"
+      },
+      "udc": {
+        "name": "Tension DC"
+      },
+      "ud01": {
+        "name": "Tension DC String 1"
+      },
+      "ud02": {
+        "name": "Tension DC String 2"
+      },
+      "ud03": {
+        "name": "Tension DC String 3"
+      },
+      "il1": {
+        "name": "Courant AC Phase 1"
+      },
+      "il2": {
+        "name": "Courant AC Phase 2"
+      },
+      "il3": {
+        "name": "Courant AC Phase 3"
+      },
+      "idc": {
+        "name": "Courant DC"
+      },
+      "id01": {
+        "name": "Courant DC String 1"
+      },
+      "id02": {
+        "name": "Courant DC String 2"
+      },
+      "id03": {
+        "name": "Courant DC String 3"
+      },
+      "kdy": {
+        "name": "Énergie du jour"
+      },
+      "kmt": {
+        "name": "Énergie du mois"
+      },
+      "kyr": {
+        "name": "Énergie de l'année"
+      },
+      "kt0": {
+        "name": "Énergie totale"
+      },
+      "kld": {
+        "name": "Énergie d'hier"
+      },
+      "klm": {
+        "name": "Énergie du mois dernier"
+      },
+      "kly": {
+        "name": "Énergie de l'année dernière"
+      },
+      "tkk": {
+        "name": "Température de l'onduleur"
+      },
+      "tk2": {
+        "name": "Température de l'onduleur 2"
+      },
+      "tk3": {
+        "name": "Température de l'onduleur 3"
+      },
+      "khr": {
+        "name": "Heures de fonctionnement"
+      },
+      "cac": {
+        "name": "Démarrages"
+      },
+      "prl": {
+        "name": "Puissance relative"
+      },
+      "pin": {
+        "name": "Puissance installée"
+      },
+      "tnf": {
+        "name": "Fréquence réseau"
+      },
+      "ulh": {
+        "name": "Tension réseau limite haute"
+      },
+      "ull": {
+        "name": "Tension réseau limite basse"
+      },
+      "tnh": {
+        "name": "Fréquence réseau limite haute"
+      },
+      "tnl": {
+        "name": "Fréquence réseau limite basse"
+      },
+      "sal": {
+        "name": "État d'alarme",
+        "state": {
+          "no_error": "Aucune erreur",
+          "external_fault_1": "Défaut externe 1",
+          "insulation_fault_dc": "Défaut d'isolation côté DC",
+          "earth_fault_current": "Courant de défaut à la terre trop élevé",
+          "fuse_break_center_earth": "Rupture de fusible terre centrale",
+          "external_alarm_2": "Alarme externe 2",
+          "long_term_temp_limit": "Limitation de température à long terme",
+          "ac_feed_in_error": "Erreur d'injection AC",
+          "external_alarm_4": "Alarme externe 4",
+          "fan_defect": "Ventilateur défectueux",
+          "fuse_break": "Rupture de fusible",
+          "temp_sensor_failure": "Défaillance du capteur de température",
+          "alarm_12": "Alarme 12",
+          "alarm_13": "Alarme 13",
+          "alarm_14": "Alarme 14",
+          "alarm_15": "Alarme 15",
+          "alarm_16": "Alarme 16",
+          "alarm_17": "Alarme 17",
+          "multiple_alarms": "Alarmes multiples",
+          "unknown_alarm": "Alarme inconnue"
+        }
+      },
+      "sys": {
+        "name": "Code d'état",
+        "state": {
+          "no_communication": "Pas de communication",
+          "in_operation": "En fonctionnement",
+          "low_irradiation": "Faible irradiation",
+          "starting_up": "Démarrage",
+          "mpp_operation": "Fonctionnement MPP",
+          "fan_running": "Ventilateur en marche",
+          "max_power_operation": "Fonctionnement à puissance maximale",
+          "temperature_limitation": "Limitation de température",
+          "grid_operation": "Fonctionnement réseau",
+          "dc_current_limited": "Courant DC limité",
+          "ac_current_limited": "Courant AC limité",
+          "test_mode": "Mode test",
+          "remote_controlled": "Télécommandé",
+          "start_delay": "Retard au démarrage",
+          "external_limitation": "Limitation externe",
+          "frequency_limitation": "Limitation de fréquence",
+          "restart_limitation": "Limitation de redémarrage",
+          "booting": "Démarrage en cours",
+          "insufficient_boot_power": "Puissance de démarrage insuffisante",
+          "insufficient_power": "Puissance insuffisante",
+          "uninitialized": "Non initialisé",
+          "disabled": "Désactivé",
+          "idle": "Inactif",
+          "powerunit_not_ready": "Unité de puissance non prête",
+          "program_firmware": "Programmation firmware",
+          "device_error_101": "Erreur appareil 101",
+          "device_error_102": "Erreur appareil 102",
+          "device_error_103": "Erreur appareil 103",
+          "device_error_104": "Erreur appareil 104",
+          "insulation_fault_dc": "Défaut d'isolation DC",
+          "insulation_fault_dc_2": "Défaut d'isolation DC (2)",
+          "device_error_107": "Erreur appareil 107",
+          "device_error_108": "Erreur appareil 108",
+          "vdc_too_high": "Tension DC trop élevée",
+          "device_error_110": "Erreur appareil 110",
+          "device_error_111": "Erreur appareil 111",
+          "device_error_112": "Erreur appareil 112",
+          "device_error_113": "Erreur appareil 113",
+          "leakage_current_high": "Courant de fuite trop élevé",
+          "no_grid": "Pas de secteur",
+          "grid_frequency_high": "Fréquence secteur trop élevée",
+          "grid_frequency_low": "Fréquence secteur trop basse",
+          "mains_error": "Erreur secteur",
+          "vac_10min_too_high": "Tension AC 10min trop élevée",
+          "device_error_120": "Erreur appareil 120",
+          "device_error_121": "Erreur appareil 121",
+          "grid_voltage_high": "Tension secteur trop élevée",
+          "grid_voltage_low": "Tension secteur trop basse",
+          "temperature_too_high": "Température trop élevée",
+          "grid_current_asymmetric": "Courant secteur asymétrique",
+          "external_input_error_1": "Erreur entrée externe 1",
+          "external_input_error_2": "Erreur entrée externe 2",
+          "device_error_128": "Erreur appareil 128",
+          "incorrect_rotation": "Sens de rotation incorrect",
+          "wrong_device_type": "Type d'appareil incorrect",
+          "main_switch_off": "Commutateur général hors",
+          "diode_overtemperature": "Diode en surchauffe",
+          "device_error_133": "Erreur appareil 133",
+          "fan_defective": "Ventilateur défectueux",
+          "device_error_135": "Erreur appareil 135",
+          "device_error_136": "Erreur appareil 136",
+          "device_error_137": "Erreur appareil 137",
+          "device_error_138": "Erreur appareil 138",
+          "device_error_139": "Erreur appareil 139",
+          "device_error_140": "Erreur appareil 140",
+          "device_error_141": "Erreur appareil 141",
+          "device_error_142": "Erreur appareil 142",
+          "device_error_143": "Erreur appareil 143",
+          "device_error_144": "Erreur appareil 144",
+          "dfdt_too_high": "df/dt trop élevé",
+          "device_error_146": "Erreur appareil 146",
+          "device_error_147": "Erreur appareil 147",
+          "device_error_148": "Erreur appareil 148",
+          "ierr_step_too_high": "Saut Ierr trop élevé",
+          "ierr_step_too_high_2": "Saut Ierr trop élevé (2)",
+          "device_error_153": "Erreur appareil 153",
+          "shutdown_1": "Arrêt 1",
+          "shutdown_2": "Arrêt 2",
+          "device_error_156": "Erreur appareil 156",
+          "insulation_fault_dc_3": "Défaut d'isolation DC (3)",
+          "device_error_158": "Erreur appareil 158",
+          "device_error_159": "Erreur appareil 159",
+          "device_error_160": "Erreur appareil 160",
+          "device_error_161": "Erreur appareil 161",
+          "device_error_163": "Erreur appareil 163",
+          "ierr_too_high_2": "Ierr trop élevé (2)",
+          "no_mains_2": "Pas de secteur (2)",
+          "frequency_too_high_2": "Fréquence trop élevée (2)",
+          "frequency_too_low_2": "Fréquence trop basse (2)",
+          "mains_error_2": "Erreur secteur (2)",
+          "vac_10min_too_high_2": "Tension AC 10min trop élevée (2)",
+          "device_error_170": "Erreur appareil 170",
+          "device_error_171": "Erreur appareil 171",
+          "vac_too_high_2": "Tension AC trop élevée (2)",
+          "vac_too_low_2": "Tension AC trop basse (2)",
+          "device_error_174": "Erreur appareil 174",
+          "device_error_175": "Erreur appareil 175",
+          "error_dc_polarity": "Erreur polarité DC",
+          "device_error_177": "Erreur appareil 177",
+          "device_error_178": "Erreur appareil 178",
+          "device_error_179": "Erreur appareil 179",
+          "vdc_too_low": "Tension DC trop basse",
+          "blocked_external": "Bloqué externe",
+          "device_error_185": "Erreur appareil 185",
+          "device_error_186": "Erreur appareil 186",
+          "device_error_187": "Erreur appareil 187",
+          "device_error_188": "Erreur appareil 188",
+          "l_n_interchanged": "L et N inversés",
+          "below_average_yield": "Rendement inférieur à la moyenne",
+          "limitation_error": "Erreur de limitation",
+          "device_error_198": "Erreur appareil 198",
+          "device_error_199": "Erreur appareil 199",
+          "device_error_999": "Erreur appareil 999",
+          "offline_expected": "Hors ligne (attendu)",
+          "offline_fault": "Hors ligne (défaut)",
+          "unknown": "Inconnu"
+        }
+      }
+    }
+  }
+}

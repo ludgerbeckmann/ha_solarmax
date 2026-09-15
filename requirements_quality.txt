@@ -1,0 +1,7 @@
+# Independent development tools. Keep these aligned with pre-commit and CI.
+# Keep diff-cover's chardet dependency inside Requests' supported range.
+chardet>=3.0.2,<6
+diff-cover==10.5.1
+ruff==0.16.6
+mypy==2.3.1
+pre-commit==4.6.2

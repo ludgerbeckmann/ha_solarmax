@@ -1,0 +1,154 @@
+#!/usr/bin/env python3
+"""Prepare source metadata and changelog entries for a release."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+import tomllib
+from datetime import UTC, datetime
+from pathlib import Path
+
+from release_common import ReleaseVersion, parse_release_tag
+
+_UNRELEASED = re.compile(
+    r"^## \[Unreleased\]\n(?P<body>.*?)(?=^## \[|\Z)",
+    flags=re.MULTILINE | re.DOTALL,
+)
+_RELEASE_HEADING = re.compile(r"^## \[(?P<version>\d+\.\d+\.\d+)\]", re.MULTILINE)
+_UNRELEASED_LINK = re.compile(r"^\[Unreleased\]: [^\n]+$", re.MULTILINE)
+_COMPARE_URL = "https://github.com/oschick/solarmax-ha-integration/compare"
+
+
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Prepare a SolarMax release")
+    parser.add_argument("tag", help="release tag in v<SemVer> form")
+    parser.add_argument(
+        "--date",
+        default=datetime.now(tz=UTC).date().isoformat(),
+        help="release date in YYYY-MM-DD form (default: today in UTC)",
+    )
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=Path(__file__).resolve().parent.parent,
+        help=argparse.SUPPRESS,
+    )
+    return parser.parse_args()
+
+
+def _updated_project(project: str, version: str) -> str:
+    section = re.search(
+        r"^\[project\]\n(?P<body>.*?)(?=^\[|\Z)",
+        project,
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        raise ValueError("pyproject.toml has no project section")
+
+    body, count = re.subn(
+        r'^version\s*=\s*"[^"]+"$',
+        f'version = "{version}"',
+        section.group("body"),
+        count=1,
+        flags=re.MULTILINE,
+    )
+    if count != 1:
+        raise ValueError("pyproject.toml has no project version")
+    return f"{project[: section.start('body')]}{body}{project[section.end('body') :]}"
+
+
+def _updated_changelog(
+    changelog: str, version: ReleaseVersion, release_date: str
+) -> str:
+    section = _UNRELEASED.search(changelog)
+    if section is None:
+        raise ValueError("changelog has no Unreleased section")
+    notes = section.group("body").strip()
+    if not notes:
+        raise ValueError("changelog Unreleased section is empty")
+
+    if version.is_prerelease:
+        return changelog
+    if re.search(
+        rf"^## \[{re.escape(version.manifest)}\](?: - [^\n]+)?$",
+        changelog,
+        flags=re.MULTILINE,
+    ):
+        raise ValueError(f"changelog already has a section for {version.manifest}")
+    previous = _RELEASE_HEADING.search(changelog, section.end())
+    if previous is None:
+        raise ValueError("changelog has no previous release section")
+
+    replacement = (
+        f"## [Unreleased]\n\n## [{version.manifest}] - {release_date}\n\n{notes}\n\n"
+    )
+    remainder = changelog[section.end() :].lstrip()
+    updated = f"{changelog[: section.start()]}{replacement}{remainder}"
+    unreleased_link = f"[Unreleased]: {_COMPARE_URL}/{version.tag}...HEAD"
+    version_link = (
+        f"[{version.manifest}]: {_COMPARE_URL}/"
+        f"v{previous.group('version')}...{version.tag}"
+    )
+    if _UNRELEASED_LINK.search(updated):
+        return _UNRELEASED_LINK.sub(
+            f"{unreleased_link}\n{version_link}", updated, count=1
+        )
+    return f"{updated.rstrip()}\n\n{unreleased_link}\n{version_link}\n"
+
+
+def _validate_current_versions(manifest_version: str, project_version: str) -> None:
+    current = parse_release_tag(f"v{manifest_version}")
+    if project_version != current.project:
+        raise ValueError(
+            "current project version "
+            f"{project_version} does not match manifest version {manifest_version}"
+        )
+
+
+def main() -> int:
+    args = _parse_args()
+    try:
+        version = parse_release_tag(args.tag)
+        datetime.strptime(args.date, "%Y-%m-%d")
+
+        root = args.root.resolve()
+        project_path = root / "pyproject.toml"
+        manifest_path = root / "custom_components" / "solarmax" / "manifest.json"
+        changelog_path = root / "CHANGELOG.md"
+
+        project_text = project_path.read_text(encoding="utf-8")
+        with project_path.open("rb") as handle:
+            project_version = tomllib.load(handle)["project"]["version"]
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        changelog = changelog_path.read_text(encoding="utf-8")
+
+        _validate_current_versions(manifest["version"], project_version)
+        updated_project = _updated_project(project_text, version.project)
+        updated_changelog = _updated_changelog(changelog, version, args.date)
+        manifest["version"] = version.manifest
+    except (
+        KeyError,
+        OSError,
+        ValueError,
+        json.JSONDecodeError,
+        tomllib.TOMLDecodeError,
+    ) as err:
+        print(err, file=sys.stderr)
+        return 1
+
+    project_path.write_text(updated_project, encoding="utf-8")
+    manifest_path.write_text(f"{json.dumps(manifest, indent=2)}\n", encoding="utf-8")
+    changelog_path.write_text(updated_changelog, encoding="utf-8")
+
+    notes = (
+        "kept in Unreleased" if version.is_prerelease else "moved to a release section"
+    )
+    print(f"prepared {version.tag}; changelog notes {notes}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

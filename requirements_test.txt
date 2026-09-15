@@ -1,0 +1,3 @@
+# Current Home Assistant test stacks for supported Python versions.
+pytest-homeassistant-custom-component==0.13.316; python_version < "3.14"
+pytest-homeassistant-custom-component==0.13.363; python_version >= "3.14"

@@ -1,0 +1,15 @@
+{
+  "domain": "solarmax",
+  "name": "Solarmax Inverter",
+  "codeowners": [
+    "@oschick"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/oschick/solarmax-ha-integration",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/oschick/solarmax-ha-integration/issues",
+  "requirements": [],
+  "version": "1.4.0"
+}

@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+"""Render pytest and coverage XML as a GitHub job summary."""
+
+from __future__ import annotations
+
+import argparse
+import platform
+import xml.etree.ElementTree as ElementTree
+from importlib.metadata import version
+from pathlib import Path
+
+
+def _test_totals(junit: Path) -> tuple[int, int, int, int, float]:
+    root = ElementTree.parse(junit).getroot()
+    suites = [root] if root.tag == "testsuite" else root.findall("./testsuite")
+    return (
+        sum(int(suite.get("tests", "0")) for suite in suites),
+        sum(int(suite.get("failures", "0")) for suite in suites),
+        sum(int(suite.get("errors", "0")) for suite in suites),
+        sum(int(suite.get("skipped", "0")) for suite in suites),
+        sum(float(suite.get("time", "0")) for suite in suites),
+    )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("report_directory", type=Path)
+    args = parser.parse_args()
+
+    report_directory: Path = args.report_directory
+    tests, failures, errors, skipped, duration = _test_totals(
+        report_directory / "junit.xml"
+    )
+
+    print("### Test summary")
+    print(f"- Python: `{platform.python_version()}`")
+    print(f"- Home Assistant: `{version('homeassistant')}`")
+    print(f"- Test plugin: `{version('pytest-homeassistant-custom-component')}`")
+    print(
+        f"- Tests: **{tests}** "
+        f"(failures: **{failures}**, errors: **{errors}**, skipped: **{skipped}**)"
+    )
+    print(f"- Duration: **{duration:.2f}s**")
+
+    coverage = report_directory / "coverage.xml"
+    if coverage.exists():
+        line_rate = float(ElementTree.parse(coverage).getroot().get("line-rate", "0"))
+        print(f"- Coverage: **{line_rate:.2%}**")
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
