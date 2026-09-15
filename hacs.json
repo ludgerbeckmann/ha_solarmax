@@ -1,7 +1,5 @@
 {
   "name": "Solarmax Inverter Integration",
-  "content_in_root": false,
-  "homeassistant": "2024.12.0",
-  "zip_release": true,
-  "filename": "solarmax.zip"
+  "render_readme": true,
+  "homeassistant": "2024.12.0"
 }
