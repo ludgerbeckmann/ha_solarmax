@@ -1,9 +1,9 @@
 # Solarmax Inverter for Home Assistant
 
-[![Validate](https://github.com/oschick/solarmax-ha-integration/actions/workflows/validate.yml/badge.svg)](https://github.com/oschick/solarmax-ha-integration/actions/workflows/validate.yml)
+[![Validate](https://github.com/ludgerbeckmann/ha_solarmax/actions/workflows/validate.yml/badge.svg)](https://github.com/ludgerbeckmann/ha_solarmax/actions/workflows/validate.yml)
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
-[![GitHub release](https://img.shields.io/github/release/oschick/solarmax-ha-integration.svg)](https://github.com/oschick/solarmax-ha-integration/releases/)
-[![GitHub license](https://img.shields.io/github/license/oschick/solarmax-ha-integration.svg)](LICENSE)
+[![GitHub release](https://img.shields.io/github/release/ludgerbeckmann/ha_solarmax.svg)](https://github.com/ludgerbeckmann/ha_solarmax/releases/)
+[![GitHub license](https://img.shields.io/github/license/ludgerbeckmann/ha_solarmax.svg)](LICENSE)
 
 Solarmax Inverter connects Home Assistant directly to a SolarMax inverter over
 the MaxComm TCP protocol on your local network. It reads production, energy
@@ -54,7 +54,7 @@ change after setup.
 
 1. Open HACS and select **Integrations**.
 2. Open the menu and select **Custom repositories**.
-3. Add `https://github.com/oschick/solarmax-ha-integration` as an
+3. Add `https://github.com/ludgerbeckmann/ha_solarmax` as an
    **Integration** repository.
 4. Search for **Solarmax Inverter** and install it.
 5. Restart Home Assistant.
@@ -64,7 +64,7 @@ HACS handles updates after the custom repository has been added.
 ### Manual installation
 
 1. Download `solarmax.zip` from the latest
-   [GitHub release](https://github.com/oschick/solarmax-ha-integration/releases/).
+   [GitHub release](https://github.com/ludgerbeckmann/ha_solarmax/releases/).
 2. Create `custom_components/solarmax` in the Home Assistant configuration
    directory and extract the archive there.
 3. Confirm that `custom_components/solarmax/manifest.json` exists.
@@ -332,7 +332,7 @@ The [troubleshooting guide](docs/troubleshooting.md) explains these checks,
 logging, connection states, and diagnostic downloads in more detail.
 
 If the problem remains, use the matching
-[GitHub issue form](https://github.com/oschick/solarmax-ha-integration/issues/new/choose).
+[GitHub issue form](https://github.com/ludgerbeckmann/ha_solarmax/issues/new/choose).
 Include the Home Assistant and integration versions, inverter model, connection
 state, relevant settings, diagnostics, and logs. Remove credentials or network
 details that you do not want to publish.

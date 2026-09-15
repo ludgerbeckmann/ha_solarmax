@@ -67,4 +67,4 @@ Include this information in a bug report:
 - Other software that can poll the inverter
 - Diagnostics and the relevant debug log window
 
-Use the [bug report form](https://github.com/oschick/solarmax-ha-integration/issues/new/choose) after removing private data.
+Use the [bug report form](https://github.com/ludgerbeckmann/ha_solarmax/issues/new/choose) after removing private data.

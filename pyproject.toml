@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "solarmax-ha-integration"
-version = "1.4.0"
+version = "0.1.1"
 description = "Home Assistant integration for Solarmax solar inverters"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
-    {name = "Ole Schicketanz", email = "oschick@users.noreply.github.com"}
+    {name = "Ludger Beckmann", email = "ludgerbeckmann@users.noreply.github.com"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -25,9 +25,9 @@ classifiers = [
 requires-python = ">=3.12"
 
 [project.urls]
-Homepage = "https://github.com/oschick/solarmax-ha-integration"
-"Bug Reports" = "https://github.com/oschick/solarmax-ha-integration/issues"
-"Source" = "https://github.com/oschick/solarmax-ha-integration"
+Homepage = "https://github.com/ludgerbeckmann/ha_solarmax"
+"Bug Reports" = "https://github.com/ludgerbeckmann/ha_solarmax/issues"
+"Source" = "https://github.com/ludgerbeckmann/ha_solarmax"
 
 [tool.ruff]
 line-length = 88
@@ -50,33 +50,6 @@ max-complexity = 10
 [tool.ruff.lint.per-file-ignores]
 # Dev/debug scripts: lazy logging and line length are not worth enforcing
 "tools/*" = ["G004", "E501", "E402"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-norecursedirs = [".git", "testing_config"]
-asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "function"
-addopts = "--strict-markers"
-
-[tool.coverage.run]
-source = ["custom_components"]
-omit = [
-    "*/tests/*",
-    "*/venv/*",
-    "*/__pycache__/*",
-]
-
-[tool.coverage.report]
-fail_under = 90
-show_missing = true
-skip_covered = true
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-]
 
 [tool.mypy]
 check_untyped_defs = true

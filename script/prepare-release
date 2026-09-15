@@ -19,7 +19,7 @@ _UNRELEASED = re.compile(
 )
 _RELEASE_HEADING = re.compile(r"^## \[(?P<version>\d+\.\d+\.\d+)\]", re.MULTILINE)
 _UNRELEASED_LINK = re.compile(r"^\[Unreleased\]: [^\n]+$", re.MULTILINE)
-_COMPARE_URL = "https://github.com/oschick/solarmax-ha-integration/compare"
+_COMPARE_URL = "https://github.com/ludgerbeckmann/ha_solarmax/compare"
 
 
 def _parse_args() -> argparse.Namespace:

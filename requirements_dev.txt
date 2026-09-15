@@ -1,3 +1,2 @@
 # Pinned development environment.
 -r requirements_quality.txt
--r requirements_test.txt

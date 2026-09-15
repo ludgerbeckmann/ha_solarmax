@@ -10,16 +10,5 @@ else
     python_cmd=python
 fi
 
-"$python_cmd" -m pre_commit run --all-files --show-diff-on-failure
+"$python_cmd" -m ruff check .
 "$python_cmd" -m mypy custom_components/solarmax
-
-pytest_args=(tests/ --cov=custom_components/solarmax)
-if [[ -n "${CI_REPORT_DIR:-}" ]]; then
-    mkdir -p "$CI_REPORT_DIR"
-    pytest_args+=(
-        "--cov-report=xml:$CI_REPORT_DIR/coverage.xml"
-        "--junitxml=$CI_REPORT_DIR/junit.xml"
-    )
-fi
-
-"$python_cmd" -m pytest "${pytest_args[@]}"

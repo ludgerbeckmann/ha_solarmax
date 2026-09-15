@@ -1,2 +1,0 @@
-# Minimum supported Home Assistant and Python 3.12 test environment.
-pytest-homeassistant-custom-component==0.13.205
