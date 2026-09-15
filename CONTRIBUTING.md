@@ -62,26 +62,16 @@ Copy `custom_components/solarmax/translations/en.json` to the target BCP 47 lang
 
 ## Releases
 
-Maintainers prepare and publish a release with these steps:
+Releases happen automatically:
 
-1. From the Actions page, run **Release** on `main` and enter the new tag.
-2. If the source is not prepared, the workflow creates a release branch and
-   provides a link for opening its pull request. Open, review, and merge the
-   pull request after its checks pass.
-3. The merge creates the validated draft release. If the source already
-   matches the requested tag, the first workflow run creates the draft.
-4. Inspect the draft, its `solarmax.zip` asset, and its changelog notes.
-5. Publish the draft.
+1. Bump the version and changelog with `script/prepare-release vX.Y.Z`
+   (updates `custom_components/solarmax/manifest.json`, `pyproject.toml`,
+   and moves the Unreleased changelog notes into a dated section).
+2. Commit and push (or merge a PR) to `main`.
+3. The `Auto Release` workflow detects the changed `manifest.json`, and if
+   no tag for that version exists yet, builds `solarmax.zip`, creates the
+   `vX.Y.Z` tag, and publishes a GitHub release with GitHub's automatically
+   generated notes (from merged PRs and commits since the last release).
 
-The workflow accepts stable versions and SemVer prerelease suffixes, including
-`v0.1.0-alpha.1`, `v0.1.0-beta.2`, `v0.1.0-rc.1`, and
-`v0.1.0-test`. A stable release moves the Unreleased notes into a dated version
-section. A prerelease keeps those notes under Unreleased so later prereleases
-and the final stable release retain the complete change summary. The release
-workflow uses the Unreleased section for prerelease notes and marks the GitHub
-draft as a prerelease.
-
-The workflow validates the source and archive before creating a tag. It also
-attests the archive and leaves the GitHub release as a draft. Rerunning the
-workflow updates an existing draft only when its tag still points to the same
-commit.
+No manual steps on GitHub are required. Pushing a version bump straight to
+`main` publishes the release immediately, so only push once you're ready.

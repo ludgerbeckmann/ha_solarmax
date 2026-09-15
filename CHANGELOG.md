@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-15
+
+### Changed
+
+- Replaced the draft/PR-based `Release` workflow with a simple `Auto Release`
+  workflow matching the `ha_smart_ventilation` pattern: pushing a version
+  bump to `main` tags and publishes the release directly, using GitHub's
+  automatically generated release notes instead of the changelog text.
+
 ## [0.1.1] - 2026-09-15
 
 ### Changed
@@ -45,6 +54,7 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/ludgerbeckmann/ha_solarmax/releases/tag/v0.1.0
