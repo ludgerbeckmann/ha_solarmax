@@ -72,7 +72,7 @@
       "title": "Problèmes de connexion de l'onduleur",
       "fix_flow": {
         "step": {
-          "init": {
+          "confirm": {
             "title": "Réparer la connexion de l'onduleur",
             "description": "L'onduleur à {host}:{port} est inaccessible depuis {minutes} minutes en journée. Modifiez l'hôte ou le port pour tester une autre connexion.",
             "data": {

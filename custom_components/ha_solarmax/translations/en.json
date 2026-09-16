@@ -72,7 +72,7 @@
       "title": "Inverter Connection Issues",
       "fix_flow": {
         "step": {
-          "init": {
+          "confirm": {
             "title": "Repair inverter connection",
             "description": "The inverter at {host}:{port} has been unreachable for {minutes} minutes during daytime. Update the host or port to test another connection.",
             "data": {
