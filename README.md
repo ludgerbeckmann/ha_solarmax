@@ -33,7 +33,7 @@ You need:
 
 | Compatibility | Models or protocol |
 | --- | --- |
-| Confirmed by users | SolarMax 7TP2, 4200S, and 3000S |
+| Confirmed by users | SolarMax 7TP2, 4200S, 3000S, and 13MT3 |
 | Likely to work | Other pre-2015 SolarMax inverters with MaxComm TCP support |
 | Not supported | Models that provide only Modbus, serial, or cloud access |
 
