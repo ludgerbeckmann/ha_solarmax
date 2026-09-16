@@ -7,9 +7,10 @@ from dataclasses import replace
 from datetime import datetime, timedelta
 from typing import Any, cast
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
+from homeassistant.config_entries import ConfigEntry, ConfigEntryState
+from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
 from homeassistant.core import HomeAssistant, State, callback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.issue_registry import (
     IssueSeverity,
     async_create_issue,
@@ -31,6 +32,7 @@ from .connection import ConnectionEngine, EngineSnapshot, EngineState
 from .const import (
     CONF_ADDRESS,
     CONF_HOST,
+    CONF_IS_GROUP,
     CONF_PORT,
     CONF_TWILIGHT_ELEVATION_THRESHOLD,
     CONF_UPDATE_INTERVAL,
@@ -48,6 +50,7 @@ from .const import (
     DOMAIN,
     FAULT_POLL_SECONDS,
     FAULT_REPAIR_SECONDS,
+    GROUP_SENSOR_TYPES,
     NIGHT_POLL_SECONDS,
     REPAIR_PENDING,
     REPAIR_PENDING_ENDPOINT,
@@ -437,7 +440,69 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         return dt_util.as_local(last)
 
 
+class SolarmaxGroupCoordinator(DataUpdateCoordinator[dict[str, float]]):
+    """Sums each summable register across every other loaded Solarmax entry.
+
+    Not tied to any inverter connection: `data` is a plain {register: sum}
+    dict, recomputed from the entity registry and current entity states
+    rather than polled over the network, so it is never itself a source of
+    connection failures. Polls on the same cadence as inverters do by
+    default so an added/removed inverter is picked up within one cycle,
+    without needing to track config entry lifecycle events.
+    """
+
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+        """Initialize the group coordinator."""
+        self._entry = entry
+        self.sensor_setup_complete = False
+        super().__init__(
+            hass,
+            _LOGGER,
+            config_entry=entry,
+            name=f"{DOMAIN}_group",
+            update_interval=timedelta(seconds=DEFAULT_UPDATE_INTERVAL),
+        )
+
+    async def _async_update_data(self) -> dict[str, float]:
+        """Recompute every register's sum; pure computation, cannot fail."""
+        return self._compute_sums()
+
+    def _member_entries(self) -> list[ConfigEntry]:
+        """Return every loaded inverter entry other than this group."""
+        return [
+            other
+            for other in self.hass.config_entries.async_entries(DOMAIN)
+            if other.entry_id != self._entry.entry_id
+            and not other.data.get(CONF_IS_GROUP, False)
+            and other.state is ConfigEntryState.LOADED
+        ]
+
+    def _compute_sums(self) -> dict[str, float]:
+        registry = er.async_get(self.hass)
+        sums: dict[str, float] = {}
+        for member in self._member_entries():
+            for description in GROUP_SENSOR_TYPES:
+                unique_id = f"{member.entry_id}-{description.key.lower()}"
+                entity_id = registry.async_get_entity_id(
+                    Platform.SENSOR, DOMAIN, unique_id
+                )
+                if entity_id is None:
+                    continue
+                state = self.hass.states.get(entity_id)
+                if state is None or state.state in (
+                    STATE_UNAVAILABLE,
+                    STATE_UNKNOWN,
+                ):
+                    continue
+                try:
+                    value = float(state.state)
+                except (TypeError, ValueError):
+                    continue
+                sums[description.key] = sums.get(description.key, 0.0) + value
+        return sums
+
+
 # Typed config entry: gives `entry.runtime_data` a real type instead of Any,
 # so mypy can actually check every coordinator access through it.
 # Plain assignment rather than PEP 695 `type` — pyproject targets >=3.11.
-SolarmaxConfigEntry = ConfigEntry[SolarmaxCoordinator]
+SolarmaxConfigEntry = ConfigEntry["SolarmaxCoordinator | SolarmaxGroupCoordinator"]

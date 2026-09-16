@@ -18,9 +18,12 @@ from .configuration import entry_option
 from .connection import EngineState
 from .const import (
     CONF_DEVICE_NAME,
+    CONF_IS_GROUP,
     CONF_NIGHT_KEEP_VALUES,
+    DEFAULT_GROUP_DEVICE_NAME,
     DEFAULT_NIGHT_KEEP_VALUES,
     DOMAIN,
+    GROUP_SENSOR_TYPES,
     NIGHT_POLICY,
     SAL_ALARM_MAP,
     SAL_STATE_MULTIPLE,
@@ -34,7 +37,11 @@ from .const import (
     SYS_STATUS_MAP,
     NightPolicy,
 )
-from .coordinator import SolarmaxConfigEntry, SolarmaxCoordinator
+from .coordinator import (
+    SolarmaxConfigEntry,
+    SolarmaxCoordinator,
+    SolarmaxGroupCoordinator,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -55,6 +62,10 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Solarmax sensor platform."""
+    if entry.data.get(CONF_IS_GROUP, False):
+        _async_setup_group_entry(entry, async_add_entities)
+        return
+
     coordinator: SolarmaxCoordinator = entry.runtime_data
     device_name = entry.data.get(CONF_DEVICE_NAME, "Solarmax Inverter")
 
@@ -67,6 +78,21 @@ async def async_setup_entry(
         coordinator.async_add_listener(
             _make_device_registry_updater(hass, entry, coordinator)
         )
+    )
+    coordinator.sensor_setup_complete = True
+
+
+@callback
+def _async_setup_group_entry(
+    entry: SolarmaxConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
+    """Set up the sum entities for the virtual inverter group entry."""
+    coordinator: SolarmaxGroupCoordinator = entry.runtime_data
+    device_name = entry.data.get(CONF_DEVICE_NAME, DEFAULT_GROUP_DEVICE_NAME)
+
+    async_add_entities(
+        SolarmaxGroupSensor(coordinator, entry, description, device_name)
+        for description in GROUP_SENSOR_TYPES
     )
     coordinator.sensor_setup_complete = True
 
@@ -350,3 +376,57 @@ class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEntity):
         if night_source != "hold":
             return False
         return self._sensor_value() is not None
+
+
+class SolarmaxGroupSensor(CoordinatorEntity[SolarmaxGroupCoordinator], SensorEntity):
+    """A sum, across every configured inverter, of one register.
+
+    Deliberately simple compared to `SolarmaxSensor`: the group has no
+    connection of its own to classify, and status/alarm registers are
+    excluded from `GROUP_SENSOR_TYPES` since there is nothing to add them
+    into, so there is no offline state, night policy, or enum decoding to
+    reproduce here.
+    """
+
+    _attr_has_entity_name = True
+
+    def __init__(
+        self,
+        coordinator: SolarmaxGroupCoordinator,
+        entry: SolarmaxConfigEntry,
+        description: SensorEntityDescription,
+        device_name: str,
+    ) -> None:
+        """Initialize the group sum sensor."""
+        super().__init__(coordinator)
+        self.entity_description = description
+        self._key = description.key
+
+        sensor_type = description.key.lower()
+        self._attr_unique_id = f"{entry.entry_id}-{sensor_type}"
+
+        device_name_normalized = device_name.lower().replace(" ", "_").replace("-", "_")
+        self.entity_id = generate_entity_id(
+            "sensor.{}",
+            f"{device_name_normalized}_{sensor_type}",
+            hass=coordinator.hass,
+        )
+
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry.entry_id)},
+            name=device_name,
+            manufacturer="Solarmax",
+            model="Inverter Group",
+        )
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the current sum, or None if no inverter contributed one."""
+        if self.coordinator.data is None:
+            return None
+        return self.coordinator.data.get(self._key)
+
+    @property
+    def available(self) -> bool:
+        """Unavailable only when no configured inverter reports this register."""
+        return self.coordinator.data is not None and self._key in self.coordinator.data

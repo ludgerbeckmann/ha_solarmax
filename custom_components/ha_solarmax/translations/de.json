@@ -3,6 +3,14 @@
     "step": {
       "user": {
         "title": "Solarmax Wechselrichter",
+        "description": "Wähle aus, was eingerichtet werden soll.",
+        "menu_options": {
+          "device": "Wechselrichter hinzufügen",
+          "group": "Wechselrichter-Gruppe hinzufügen (summiert alle eingerichteten Wechselrichter)"
+        }
+      },
+      "device": {
+        "title": "Solarmax Wechselrichter",
         "description": "Richten Sie Ihren Solarmax Wechselrichter ein",
         "data": {
           "host": "Host",
@@ -17,6 +25,10 @@
         "data_description": {
           "twilight_elevation_threshold": "Sonnenhöhenwinkel, unterhalb dessen eine unangekündigte Verbindungstrennung als erwartet gilt (startet außerdem die schnellere Abfrage in der Dämmerung)."
         }
+      },
+      "group": {
+        "title": "Solarmax Wechselrichter-Gruppe",
+        "description": "Erstellt ein virtuelles Gerät mit einer Summen-Entität für jedes Register, das mindestens ein konfigurierter Wechselrichter liefert. Später hinzugefügte oder entfernte Wechselrichter werden automatisch berücksichtigt."
       },
       "reconfigure": {
         "title": "Wechselrichterverbindung ändern",
@@ -44,7 +56,9 @@
     },
     "abort": {
       "already_configured": "Gerät ist bereits konfiguriert",
-      "reconfigure_successful": "Die Wechselrichterkonfiguration wurde aktualisiert."
+      "reconfigure_successful": "Die Wechselrichterkonfiguration wurde aktualisiert.",
+      "group_already_configured": "Die Wechselrichter-Gruppe ist bereits eingerichtet",
+      "group_not_reconfigurable": "Für die Wechselrichter-Gruppe gibt es nichts zu rekonfigurieren"
     }
   },
   "options": {
@@ -65,6 +79,9 @@
     },
     "error": {
       "reload_failed": "Home Assistant konnte die neue Verbindung nicht aktivieren. Die vorherigen Einstellungen wurden wiederhergestellt."
+    },
+    "abort": {
+      "group_not_configurable": "Die Wechselrichter-Gruppe hat keine Optionen"
     }
   },
   "issues": {

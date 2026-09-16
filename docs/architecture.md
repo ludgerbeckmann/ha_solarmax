@@ -86,6 +86,14 @@ The coordinator also exposes device metadata and sends a local-midnight listener
 
 Entity unique IDs form persistent user data. `_UNIQUE_ID_MIGRATIONS` in `__init__.py` handles any required key rename.
 
+### Inverter group
+
+The config flow's `user` step is a menu offering either a single inverter (`device`) or the one virtual group entry (`group`, fixed `unique_id`, so at most one exists). A group entry's data is just `{CONF_IS_GROUP: True}` -- it has no host, port, or address, so `__init__.py`, `config_flow.py`, and `sensor.py` each branch on that flag near the top of their entry points rather than threading a type through every function.
+
+`SolarmaxGroupCoordinator` sums each `GROUP_SENSOR_TYPES` register (every `SENSOR_TYPES` entry except `SYS`/`SAL`, which are enum codes, not numbers) across every other loaded, non-group entry. It polls independently on the same default cadence as an inverter, but never touches the network: each tick it looks up every member's per-register entity by reconstructing its unique_id (`{entry_id}-{key.lower()}`) through the entity registry, reads that entity's current state, and adds it in if the state is a number. A member with no value for a register, or that is currently unavailable, is simply left out of that register's sum rather than invalidating it -- reusing the entity registry and state machine this way means the group inherits each inverter's own night-policy and availability handling for free, instead of reimplementing it. Polling this way, rather than reacting to config-entry or coordinator-update events, means an inverter added or removed later is picked up within one cycle with no membership list to keep in sync.
+
+`SolarmaxGroupSensor` is deliberately thin next to `SolarmaxSensor`: no offline classification, night policy, or enum decoding, since none of that applies to a plain sum. It is unavailable only when no member currently contributes a value for its register.
+
 ### Setup and teardown
 
 Schema version 2 stores host, port, inverter address, and device name in
@@ -114,7 +122,7 @@ change. If Home Assistant cannot load the changed entry, the transaction
 restores the snapshot and reloads the prior configuration. Cancellation waits
 for the apply-or-rollback transaction to reach a stable state.
 
-Entry setup stores the coordinator in typed `ConfigEntry.runtime_data`, migrates entity IDs, forwards the sensor platform, and registers the midnight listener. Entry unload closes the engine after platform teardown succeeds.
+Entry setup stores the coordinator in typed `ConfigEntry.runtime_data`, migrates entity IDs, forwards the sensor platform, and registers the midnight listener. Entry unload closes the engine after platform teardown succeeds. The group entry skips all of this except forwarding the sensor platform: no link to acquire, no unique IDs to migrate, no midnight listener, and unload just stops its own polling coordinator.
 
 ## Test strategy
 

@@ -17,6 +17,7 @@ account.
 - One persistent inverter connection with automatic recovery
 - Faster checks after daytime failures and quiet polling overnight
 - Clear states for normal shutdowns and unexpected connection faults
+- Optional inverter group with automatic sum entities across every inverter
 - Native reconfiguration and repair flows in Home Assistant
 - English, German, and French translations
 
@@ -113,6 +114,24 @@ inverter.
 Options do not require a connection test. Home Assistant reloads the
 integration after saving them and restores the previous options if that reload
 fails.
+
+### Multiple inverters and the inverter group
+
+Add one config entry per inverter, each with its own address (1-249). Several
+inverters can share one host and port when they sit behind the same MaxComm
+gateway; the integration serializes and shares that connection between them
+automatically.
+
+To get combined totals across every inverter, select **Add integration**,
+choose **Solarmax Inverter** again, and pick **Add the inverter group**
+instead of adding another device. This creates one virtual device with a sum
+entity for every register reported by at least one configured inverter (for
+example, a combined AC Power across all inverters). Only one group can exist.
+Inverters added or removed later are picked up automatically, without
+reconfiguring the group. A register missing or unavailable on one inverter is
+left out of that register's sum rather than making the whole sum unavailable;
+a sum entity itself is only unavailable when no inverter currently reports
+that register at all.
 
 ### Checksum verification
 

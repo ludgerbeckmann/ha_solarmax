@@ -30,6 +30,7 @@ from .const import (
     CONF_ADDRESS,
     CONF_DEVICE_NAME,
     CONF_HOST,
+    CONF_IS_GROUP,
     CONF_NIGHT_KEEP_VALUES,
     CONF_PORT,
     CONF_TWILIGHT_ELEVATION_THRESHOLD,
@@ -37,12 +38,14 @@ from .const import (
     CONF_VERIFY_CHECKSUM,
     DEFAULT_ADDRESS,
     DEFAULT_DEVICE_NAME,
+    DEFAULT_GROUP_DEVICE_NAME,
     DEFAULT_NIGHT_KEEP_VALUES,
     DEFAULT_PORT,
     DEFAULT_TWILIGHT_ELEVATION_THRESHOLD,
     DEFAULT_UPDATE_INTERVAL,
     DEFAULT_VERIFY_CHECKSUM,
     DOMAIN,
+    GROUP_UNIQUE_ID,
 )
 _LOGGER = logging.getLogger(__name__)
 # Plain min/max int fields render as a slider in the HA frontend, which is
@@ -135,7 +138,27 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Handle the initial step."""
+        """Offer a choice between a single inverter and the summary group."""
+        return self.async_show_menu(step_id="user", menu_options=["device", "group"])
+
+    async def async_step_group(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Create the single virtual entry summing every configured inverter."""
+        await self.async_set_unique_id(GROUP_UNIQUE_ID)
+        self._abort_if_unique_id_configured()
+        if user_input is not None:
+            return self.async_create_entry(
+                title=DEFAULT_GROUP_DEVICE_NAME,
+                data={CONF_IS_GROUP: True},
+                options={},
+            )
+        return self.async_show_form(step_id="group", data_schema=vol.Schema({}))
+
+    async def async_step_device(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle setting up a single inverter."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -168,7 +191,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         title=data[CONF_DEVICE_NAME], data=data, options=options
                     )
         return self.async_show_form(
-            step_id="user",
+            step_id="device",
             data_schema=_build_schema(_DEFAULT_VALUES),
             errors=errors,
         )
@@ -178,6 +201,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Validate and atomically replace connection settings."""
         entry = self._get_reconfigure_entry()
+        if entry.data.get(CONF_IS_GROUP, False):
+            return self.async_abort(reason="group_not_reconfigurable")
         errors: dict[str, str] = {}
         if user_input is not None:
             async with configuration_mutation_lock(self.hass):
@@ -267,6 +292,8 @@ class OptionsFlow(config_entries.OptionsFlow):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Update settings without opening a second inverter connection."""
+        if self.config_entry.data.get(CONF_IS_GROUP, False):
+            return self.async_abort(reason="group_not_configurable")
         errors: dict[str, str] = {}
         if user_input is not None:
             async with configuration_mutation_lock(self.hass):

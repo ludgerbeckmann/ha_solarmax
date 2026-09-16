@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-16
+
+### Added
+
+- An optional inverter group entry (`Add integration` → **Solarmax
+  Inverter** → **Add the inverter group**). It creates one virtual device
+  with a sum entity for every register reported by at least one configured
+  inverter, so a combined AC Power (and similar) is available without
+  manually building Home Assistant helper groups per entity. Only one
+  group can exist; inverters added or removed later are picked up
+  automatically. A register missing or unavailable on one inverter is left
+  out of that register's sum rather than invalidating it; a sum entity is
+  unavailable only when no inverter currently reports that register.
+
 ## [0.3.2] - 2026-09-16
 
 ### Changed
@@ -138,7 +152,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.2...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.2.4...v0.3.0

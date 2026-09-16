@@ -13,13 +13,18 @@ from .configuration import OPTION_DEFAULTS, endpoint_unique_id, entry_option
 from .const import (
     CONF_ADDRESS,
     CONF_HOST,
+    CONF_IS_GROUP,
     CONF_NIGHT_KEEP_VALUES,
     CONF_PORT,
     DEFAULT_ADDRESS,
     DEFAULT_NIGHT_KEEP_VALUES,
     DOMAIN,
 )
-from .coordinator import SolarmaxConfigEntry, SolarmaxCoordinator
+from .coordinator import (
+    SolarmaxConfigEntry,
+    SolarmaxCoordinator,
+    SolarmaxGroupCoordinator,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -87,6 +92,9 @@ def _migrate_unique_ids(hass: HomeAssistant, entry: SolarmaxConfigEntry) -> None
 
 async def async_setup_entry(hass: HomeAssistant, entry: SolarmaxConfigEntry) -> bool:
     """Set up Solarmax Inverter from a config entry."""
+    if entry.data.get(CONF_IS_GROUP, False):
+        return await _async_setup_group_entry(hass, entry)
+
     # Migrate renamed entity unique IDs (v1.2.0 → v1.2.1: KDL → KLD)
     _migrate_unique_ids(hass, entry)
 
@@ -133,6 +141,29 @@ async def async_setup_entry(hass: HomeAssistant, entry: SolarmaxConfigEntry) -> 
     return True
 
 
+async def _async_setup_group_entry(
+    hass: HomeAssistant, entry: SolarmaxConfigEntry
+) -> bool:
+    """Set up the virtual entry summing every other configured inverter."""
+    coordinator = SolarmaxGroupCoordinator(hass, entry)
+
+    try:
+        await coordinator.async_config_entry_first_refresh()
+        entry.runtime_data = coordinator
+        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+        if not coordinator.sensor_setup_complete:
+            raise RuntimeError("Solarmax group sensor platform setup failed")
+        _LOGGER.info("Successfully set up the Solarmax inverter group")
+    except BaseException:
+        try:
+            await coordinator.async_shutdown()
+        finally:
+            if getattr(entry, "runtime_data", None) is coordinator:
+                object.__delattr__(entry, "runtime_data")
+        raise
+    return True
+
+
 async def async_unload_entry(hass: HomeAssistant, entry: SolarmaxConfigEntry) -> bool:
     """Unload a config entry (runtime_data is cleaned up automatically).
 
@@ -140,9 +171,15 @@ async def async_unload_entry(hass: HomeAssistant, entry: SolarmaxConfigEntry) ->
     leaves the config entry loaded. A successful teardown is followed by
     releasing this entry's (possibly shared) link, which drains any poll
     still in flight and terminally closes the link once no sibling entry
-    on the same host:port still needs it.
+    on the same host:port still needs it. The group entry has no link to
+    release -- unloading its sensor platform and stopping its own polling
+    coordinator is all there is to tear down.
     """
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
+    if not unload_ok:
+        return False
+    if entry.data.get(CONF_IS_GROUP, False):
+        await entry.runtime_data.async_shutdown()
+    else:
         await entry.runtime_data.async_close()
-    return unload_ok
+    return True

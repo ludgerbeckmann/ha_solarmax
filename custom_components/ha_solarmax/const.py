@@ -20,12 +20,18 @@ CONF_DEVICE_NAME = "device_name"
 CONF_VERIFY_CHECKSUM = "verify_checksum"
 CONF_TWILIGHT_ELEVATION_THRESHOLD = "twilight_elevation_threshold"
 CONF_NIGHT_KEEP_VALUES = "night_keep_values"
+CONF_IS_GROUP = "is_group"
 
 # Default values
 DEFAULT_PORT = 12345
 DEFAULT_ADDRESS = 1
 DEFAULT_UPDATE_INTERVAL = 30
 DEFAULT_DEVICE_NAME = "Solarmax Inverter"
+DEFAULT_GROUP_DEVICE_NAME = "Solarmax Inverter Group"
+# A single virtual entry summing every configured inverter; there is only
+# ever one, so it gets a fixed unique_id instead of one derived from a
+# connection endpoint.
+GROUP_UNIQUE_ID = "solarmax_inverter_group"
 DEFAULT_VERIFY_CHECKSUM = True
 # Sun elevation (in degrees) below which the inverter is considered to be in
 # the dusk/dawn twilight window and expected to be offline due to
@@ -761,6 +767,14 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         icon="mdi:information",
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
+)
+
+# Registers the inverter group can sum. SYS and SAL are enum/bitmask codes,
+# not numbers, so there is nothing to add them into.
+GROUP_SENSOR_TYPES: tuple[SensorEntityDescription, ...] = tuple(
+    description
+    for description in SENSOR_TYPES
+    if description.key not in (SENSOR_TYPE_STATUS, SENSOR_TYPE_ALARM)
 )
 
 

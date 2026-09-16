@@ -3,6 +3,14 @@
     "step": {
       "user": {
         "title": "Solarmax Inverter",
+        "description": "Choose what to set up.",
+        "menu_options": {
+          "device": "Add an inverter",
+          "group": "Add the inverter group (sums every configured inverter)"
+        }
+      },
+      "device": {
+        "title": "Solarmax Inverter",
         "description": "Set up your Solarmax inverter",
         "data": {
           "host": "Host",
@@ -17,6 +25,10 @@
         "data_description": {
           "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling)."
         }
+      },
+      "group": {
+        "title": "Solarmax Inverter Group",
+        "description": "Creates one virtual device with a sum entity for every register reported by at least one configured inverter. Inverters added or removed later are picked up automatically."
       },
       "reconfigure": {
         "title": "Change inverter connection",
@@ -44,7 +56,9 @@
     },
     "abort": {
       "already_configured": "Device is already configured",
-      "reconfigure_successful": "The inverter configuration was updated."
+      "reconfigure_successful": "The inverter configuration was updated.",
+      "group_already_configured": "The inverter group is already configured",
+      "group_not_reconfigurable": "The inverter group has nothing to reconfigure"
     }
   },
   "options": {
@@ -65,6 +79,9 @@
     },
     "error": {
       "reload_failed": "Home Assistant could not activate the new connection. The previous settings were restored."
+    },
+    "abort": {
+      "group_not_configurable": "The inverter group has no options to configure"
     }
   },
   "issues": {

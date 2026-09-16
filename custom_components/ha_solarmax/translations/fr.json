@@ -3,6 +3,14 @@
     "step": {
       "user": {
         "title": "Onduleur Solarmax",
+        "description": "Choisissez ce que vous souhaitez configurer.",
+        "menu_options": {
+          "device": "Ajouter un onduleur",
+          "group": "Ajouter le groupe d'onduleurs (somme de tous les onduleurs configurés)"
+        }
+      },
+      "device": {
+        "title": "Onduleur Solarmax",
         "description": "Configurer votre onduleur Solarmax",
         "data": {
           "host": "Hôte",
@@ -17,6 +25,10 @@
         "data_description": {
           "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube)."
         }
+      },
+      "group": {
+        "title": "Groupe d'onduleurs Solarmax",
+        "description": "Crée un appareil virtuel avec une entité de somme pour chaque registre fourni par au moins un onduleur configuré. Les onduleurs ajoutés ou supprimés ultérieurement sont pris en compte automatiquement."
       },
       "reconfigure": {
         "title": "Modifier la connexion de l'onduleur",
@@ -44,7 +56,9 @@
     },
     "abort": {
       "already_configured": "L'appareil est déjà configuré",
-      "reconfigure_successful": "La configuration de l'onduleur a été mise à jour."
+      "reconfigure_successful": "La configuration de l'onduleur a été mise à jour.",
+      "group_already_configured": "Le groupe d'onduleurs est déjà configuré",
+      "group_not_reconfigurable": "Le groupe d'onduleurs n'a rien à reconfigurer"
     }
   },
   "options": {
@@ -65,6 +79,9 @@
     },
     "error": {
       "reload_failed": "Home Assistant n'a pas pu activer la nouvelle connexion. Les paramètres précédents ont été restaurés."
+    },
+    "abort": {
+      "group_not_configurable": "Le groupe d'onduleurs n'a aucune option à configurer"
     }
   },
   "issues": {
