@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-09-16
+
+### Fixed
+
+- Fixed a crash downloading diagnostics for the inverter group entry
+  (`AttributeError` on `sun_source`/`device_model`/etc., which only exist
+  on a single-inverter `SolarmaxCoordinator`). `diagnostics.py` was never
+  updated when the group entry type was added in 0.4.0. It now branches
+  on the entry type, same as `__init__.py`, `config_flow.py`, and
+  `sensor.py` already do, and returns the group's computed sums instead.
+
 ## [0.5.0] - 2026-09-16
 
 ### Added
@@ -210,7 +221,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.4...v0.5.0
 [0.4.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.2...v0.4.3

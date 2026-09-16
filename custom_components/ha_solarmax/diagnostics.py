@@ -8,8 +8,12 @@ from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import async_get_integration
 
-from .const import CONF_HOST, DEVICE_KEY_SERIAL
-from .coordinator import SolarmaxConfigEntry, SolarmaxCoordinator
+from .const import CONF_HOST, CONF_IS_GROUP, DEVICE_KEY_SERIAL
+from .coordinator import (
+    SolarmaxConfigEntry,
+    SolarmaxCoordinator,
+    SolarmaxGroupCoordinator,
+)
 
 # Redact the host and both names used for inverter serial data.
 REDACT_KEYS = {CONF_HOST, DEVICE_KEY_SERIAL, "serial_number"}
@@ -19,10 +23,50 @@ async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, entry: SolarmaxConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
+    integration = await async_get_integration(hass, entry.domain)
+    if entry.data.get(CONF_IS_GROUP, False):
+        return _group_diagnostics(hass, entry, integration)
+    return _inverter_diagnostics(hass, entry, integration)
+
+
+def _group_diagnostics(
+    hass: HomeAssistant, entry: SolarmaxConfigEntry, integration: Any
+) -> dict[str, Any]:
+    """Return diagnostics for the virtual inverter group entry.
+
+    Nothing here needs redaction: `entry.data` is just the group marker,
+    and the summed values carry no host, serial, or other identifying data.
+    """
+    coordinator: SolarmaxGroupCoordinator = entry.runtime_data
+    return {
+        "config_entry": {
+            "entry_id": entry.entry_id,
+            "version": entry.version,
+            "minor_version": entry.minor_version,
+            "domain": entry.domain,
+            "title": entry.title,
+            "data": entry.data,
+            "options": entry.options,
+            "source": entry.source,
+            "state": entry.state.value if entry.state else None,
+        },
+        "coordinator": {
+            "update_interval": str(coordinator.update_interval),
+            "sums": coordinator.data or {},
+        },
+        "system_info": {
+            "ha_version": hass.config.as_dict().get("version"),
+            "integration_version": str(integration.version),
+        },
+    }
+
+
+def _inverter_diagnostics(
+    hass: HomeAssistant, entry: SolarmaxConfigEntry, integration: Any
+) -> dict[str, Any]:
+    """Return diagnostics for a single-inverter config entry."""
     coordinator: SolarmaxCoordinator = entry.runtime_data
     snapshot = coordinator.data
-
-    integration = await async_get_integration(hass, entry.domain)
 
     diagnostics_data: dict[str, Any] = {
         "config_entry": {
