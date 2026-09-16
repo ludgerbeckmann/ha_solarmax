@@ -21,7 +21,7 @@ from homeassistant.helpers.issue_registry import (
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
 
-from .configuration import endpoint_unique_id, entry_option
+from .configuration import endpoint_bus_lock, endpoint_unique_id, entry_option
 from .connection import ConnectionEngine, EngineSnapshot, EngineState, SolarmaxLink
 from .const import (
     CONF_ADDRESS,
@@ -87,6 +87,9 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
                 entry, CONF_VERIFY_CHECKSUM, DEFAULT_VERIFY_CHECKSUM
             ),
             today=lambda: dt_util.now().date(),
+            bus_lock=endpoint_bus_lock(
+                hass, entry.data[CONF_HOST], entry.data[CONF_PORT]
+            ),
         )
 
         self._configured_interval = timedelta(

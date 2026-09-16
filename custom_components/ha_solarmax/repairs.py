@@ -150,6 +150,7 @@ class SolarmaxConnectionRepairFlow(RepairsFlow):
                 if registry.async_get_issue(DOMAIN, self.issue_id) is None:
                     return self.async_abort(reason="issue_missing")
                 await validate_connection(
+                    self.hass,
                     host=host,
                     port=port,
                     address=entry.data[CONF_ADDRESS],

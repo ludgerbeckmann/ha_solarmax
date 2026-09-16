@@ -150,6 +150,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 self._abort_if_unique_id_configured()
                 try:
                     await validate_connection(
+                        self.hass,
                         host=host,
                         port=port,
                         address=address,
@@ -233,6 +234,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason="already_configured")
         async with validation_handoff(entry):
             await validate_connection(
+                self.hass,
                 host=host,
                 port=port,
                 address=address,
