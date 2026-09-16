@@ -36,7 +36,7 @@ _LOGGER = logging.getLogger(__name__)
 LOW_PDC_WATTS = 25
 SHUTDOWN_ANNOUNCE_SYS = 20002
 STARTUP_GRACE_SECONDS = 150.0
-POLL_BUDGET_SECONDS = 15.0
+POLL_BUDGET_SECONDS = 20.0
 STATIC_FETCH_MAX_ATTEMPTS = 2
 # Prevent stale shutdown evidence from masking a sustained daytime fault.
 ARMED_ESCALATION_SECONDS = 3600.0

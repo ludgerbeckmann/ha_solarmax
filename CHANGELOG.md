@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-09-16
+
+### Changed
+
+- Raised the per-poll timeout budget (`POLL_BUDGET_SECONDS`) from 15s to
+  20s. In the worst case, a timeout during both the static-field fetch and
+  the hot-field fetch can each trigger the link's own reconnect-and-resend
+  plus the engine's one retry, stacking to noticeably more than 15s within
+  a single `poll()` call. When that happened, the outer poll timeout could
+  fire and classify a slow-but-recovering exchange (e.g. a busy multi-
+  inverter RS485 bus) as a fault, even though the link wasn't stuck. The
+  larger budget gives that worst-case retry chain room to finish.
+
 ## [0.5.1] - 2026-09-16
 
 ### Fixed
@@ -221,7 +234,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.2...HEAD
+[0.5.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.4...v0.5.0
 [0.4.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.3...v0.4.4
