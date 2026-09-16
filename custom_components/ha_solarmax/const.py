@@ -602,7 +602,7 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:solar-power",
     ),
-    # Historical energy (opt-in; not provided by all inverters). These are
+    # Historical energy (not provided by all inverters). These are
     # point-in-time totals for a past period, not a running meter, so they have
     # no state_class (state_class=measurement is invalid for energy in HA).
     SensorEntityDescription(
@@ -611,7 +611,6 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         native_unit_of_measurement="kWh",
         device_class=SensorDeviceClass.ENERGY,
         icon="mdi:solar-power",
-        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="KLM",
@@ -619,7 +618,6 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         native_unit_of_measurement="kWh",
         device_class=SensorDeviceClass.ENERGY,
         icon="mdi:solar-power",
-        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="KLY",
@@ -627,7 +625,6 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         native_unit_of_measurement="kWh",
         device_class=SensorDeviceClass.ENERGY,
         icon="mdi:solar-power",
-        entity_registry_enabled_default=False,
     ),
     # --- Temperatures (diagnostic, opt-in) ---
     SensorEntityDescription(
@@ -668,7 +665,6 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:clock-outline",
         entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="CAC",
@@ -676,7 +672,6 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:restart",
         entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="PRL",
@@ -684,7 +679,6 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         native_unit_of_measurement="%",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:gauge",
-        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="PIN",
@@ -694,7 +688,6 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:information",
         entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
     ),
     # --- Grid monitoring (diagnostic, opt-in) ---
     SensorEntityDescription(

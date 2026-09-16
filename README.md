@@ -292,17 +292,15 @@ in parentheses to make protocol logs and diagnostics easier to interpret.
 | Energy this month | `KMT` | kWh |
 | Energy this year | `KYR` | kWh |
 | Total energy | `KT0` | kWh |
-| Alarm | `SAL` | Translated alarm state and active alarm details |
-| Status Code | `SYS` | Translated inverter or connection state |
-
-### Optional production and history entities
-
-| Entity | Register | Unit |
-| --- | --- | --- |
 | Energy yesterday | `KLD` | kWh |
 | Energy last month | `KLM` | kWh |
 | Energy last year | `KLY` | kWh |
 | Relative power | `PRL` | % |
+| Operating hours | `KHR` | h |
+| Start count | `CAC` | count |
+| Installed power | `PIN` | W |
+| Alarm | `SAL` | Translated alarm state and active alarm details |
+| Status Code | `SYS` | Translated inverter or connection state |
 
 ### Optional diagnostic entities
 
@@ -314,9 +312,6 @@ in parentheses to make protocol logs and diagnostics easier to interpret.
 | AC phase current | `IL1`–`IL3` | A |
 | DC and string current | `IDC`, `ID01`–`ID03` | A |
 | Temperature | `TKK`, `TK2`, `TK3` | °C |
-| Operating hours | `KHR` | h |
-| Start count | `CAC` | count |
-| Installed power | `PIN` | W |
 | Grid frequency | `TNF` | Hz |
 | Grid voltage limits | `ULH`, `ULL` | V |
 | Grid frequency limits | `TNH`, `TNL` | Hz |

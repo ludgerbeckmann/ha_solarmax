@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-09-16
+
+### Changed
+
+- Enabled by default for newly created entities: Energy yesterday (`KLD`),
+  Energy last month (`KLM`), Energy last year (`KLY`), Relative power
+  (`PRL`), Operating hours (`KHR`), Start count (`CAC`), and Installed
+  power (`PIN`) — previously opt-in. This only affects entities Home
+  Assistant has not created yet (a new inverter, or one of these enabled
+  for the first time); existing disabled entities keep their current
+  state.
+
 ## [0.4.3] - 2026-09-16
 
 ### Fixed
@@ -184,7 +196,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.3...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.4...HEAD
+[0.4.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.0...v0.4.1
