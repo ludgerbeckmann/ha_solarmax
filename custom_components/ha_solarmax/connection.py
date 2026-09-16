@@ -82,6 +82,11 @@ class EngineDiagnostics:
     polls_ok: int = 0
     last_successful_poll: datetime | None = None
     last_shutdown_announcement: datetime | None = None
+    # Set once per fault episode and never cleared, unlike the transient
+    # per-episode `fault_since` used for repair-issue timing -- this is a
+    # durable "when did this last happen" signal that survives recovery,
+    # for monitoring/alerting long after the fault itself resolved.
+    last_fault_started: datetime | None = None
     transitions: list[tuple[str, str, str]] = field(default_factory=list)
 
     def record_transition(self, from_state: str, to_state: str) -> None:
@@ -533,6 +538,7 @@ class ConnectionEngine:
 
         self._tracker.armed = False
         self._fault_since = datetime.now(UTC)
+        self._diagnostics.last_fault_started = self._fault_since
         self._reset_escalation()
         return EngineState.OFFLINE_FAULT, False
 
@@ -556,6 +562,7 @@ class ConnectionEngine:
             return EngineState.UNKNOWN, True
         if self._fault_since is None:
             self._fault_since = datetime.now(UTC)
+            self._diagnostics.last_fault_started = self._fault_since
         return EngineState.OFFLINE_FAULT, reconnecting
 
     def _reset_escalation(self) -> None:

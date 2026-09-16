@@ -6,10 +6,16 @@ import logging
 from collections.abc import Callable
 from typing import Any
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from datetime import datetime
+
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.entity import DeviceInfo, generate_entity_id
+from homeassistant.helpers.entity import DeviceInfo, EntityCategory, generate_entity_id
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
@@ -70,8 +76,13 @@ async def async_setup_entry(
     device_name = entry.data.get(CONF_DEVICE_NAME, "Solarmax Inverter")
 
     async_add_entities(
-        SolarmaxSensor(coordinator, entry, description, device_name)
-        for description in SENSOR_TYPES
+        [
+            *(
+                SolarmaxSensor(coordinator, entry, description, device_name)
+                for description in SENSOR_TYPES
+            ),
+            SolarmaxLastFaultSensor(coordinator, entry, device_name),
+        ]
     )
 
     entry.async_on_unload(
@@ -376,6 +387,57 @@ class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEntity):
         if night_source != "hold":
             return False
         return self._sensor_value() is not None
+
+
+class SolarmaxLastFaultSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEntity):
+    """Timestamp of the most recent unexpected daytime connection fault.
+
+    A separate, minimal class rather than another `SolarmaxSensor` key:
+    this value comes from `coordinator.last_fault_started`, not a polled
+    MaxComm register, and unlike a measurement it should stay visible
+    (and unaffected by night policy) whether the inverter is currently
+    online, offline, or has never faulted at all. Left `None` by a startup
+    grace period or a disconnect explained by shutdown evidence or
+    darkness, so routine restarts, updates, and nightly shutdowns are
+    never recorded as a fault.
+    """
+
+    _attr_has_entity_name = True
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:lan-disconnect"
+
+    def __init__(
+        self,
+        coordinator: SolarmaxCoordinator,
+        entry: SolarmaxConfigEntry,
+        device_name: str,
+    ) -> None:
+        """Initialize the last-fault sensor."""
+        super().__init__(coordinator)
+        self._attr_translation_key = "last_connection_fault"
+        self._attr_unique_id = f"{entry.entry_id}-last_connection_fault"
+
+        device_name_normalized = device_name.lower().replace(" ", "_").replace("-", "_")
+        self.entity_id = generate_entity_id(
+            "sensor.{}",
+            f"{device_name_normalized}_last_connection_fault",
+            hass=coordinator.hass,
+        )
+
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry.entry_id)},
+            name=device_name,
+            manufacturer="Solarmax",
+            model=coordinator.device_model or "Inverter",
+            sw_version=coordinator.sw_version,
+            serial_number=coordinator.serial_number,
+        )
+
+    @property
+    def native_value(self) -> datetime | None:
+        """Return when the most recent unexpected daytime fault began."""
+        return self.coordinator.last_fault_started
 
 
 class SolarmaxGroupSensor(CoordinatorEntity[SolarmaxGroupCoordinator], SensorEntity):

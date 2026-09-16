@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-16
+
+### Added
+
+- A new **Last Connection Fault** sensor recording when the most recent
+  unexpected daytime connection fault began, kept visible after recovery
+  as a monitoring/alerting signal (e.g. "notify me if this changed in the
+  last few minutes"). `EngineDiagnostics.last_fault_started` is set once
+  per fault episode and never cleared, unlike the transient `fault_since`
+  used for repair-issue timing. A startup-grace reconnect and any
+  disconnect the engine can already explain (shutdown evidence, or
+  darkness below the twilight threshold) never set it, so routine restarts,
+  updates, and nightly shutdowns are never recorded as a fault.
+
 ## [0.4.4] - 2026-09-16
 
 ### Changed
@@ -196,7 +210,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.4...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.4...v0.5.0
 [0.4.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.1...v0.4.2

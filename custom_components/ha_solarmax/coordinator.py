@@ -439,6 +439,22 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
             return None
         return dt_util.as_local(last)
 
+    @property
+    def last_fault_started(self) -> datetime | None:
+        """Return when the most recent unexpected daytime fault began.
+
+        Persists across a later successful reconnect, unlike the transient
+        `EngineSnapshot.fault_since` used for repair-issue timing, so it
+        remains a durable monitoring/alerting signal after recovery. Never
+        set by a night/shutdown-explained disconnect or by the startup
+        grace period, so routine restarts, updates, and nightly shutdowns
+        are not recorded here.
+        """
+        if self.data is None:
+            return None
+        value = self.data.diagnostics.get("last_fault_started")
+        return value if isinstance(value, datetime) else None
+
 
 class SolarmaxGroupCoordinator(DataUpdateCoordinator[dict[str, float]]):
     """Sums each summable register across every other loaded Solarmax entry.

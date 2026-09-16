@@ -84,6 +84,8 @@ The coordinator also exposes device metadata and sends a local-midnight listener
 
 `SolarmaxSensor` turns snapshot values into Home Assistant entities. The Status Code entity remains available during connection failures and exposes the state plus diagnostic attributes. Other entities use the per-key night policy from `const.py` when the user enables overnight values.
 
+`SolarmaxLastFaultSensor` is a separate, minimal `CoordinatorEntity`: a timestamp of `EngineDiagnostics.last_fault_started`, the moment `ConnectionEngine` most recently entered `OFFLINE_FAULT` (`_daytime_failure()` / the escalation branch of `_expected_failure()`). Unlike `EngineSnapshot.fault_since`, which the coordinator clears on the next successful poll for repair-issue timing, `last_fault_started` is set once per fault episode and never cleared, so it stays a durable "when did this last happen" signal for monitoring and automations long after recovery. A startup-grace reconnect and a disconnect the engine can explain (shutdown evidence, or sun below the twilight threshold) never set it, so routine restarts, updates, and nightly shutdowns are not recorded as a fault.
+
 Entity unique IDs form persistent user data. `_UNIQUE_ID_MIGRATIONS` in `__init__.py` handles any required key rename.
 
 ### Inverter group

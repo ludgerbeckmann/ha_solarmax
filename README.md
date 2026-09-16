@@ -241,6 +241,17 @@ Automations created with an older version must replace **Offline (Night)**
 **Connection failed** (`connection_failed`) with **Offline (fault)**
 (`offline_fault`). Automations match the raw values shown in parentheses.
 
+### Last Connection Fault
+
+This entity records when the most recent unexpected daytime connection
+fault began, and keeps showing that time after the inverter recovers — a
+history/alerting signal for a dashboard or an automation such as "notify
+me if this changed in the last few minutes". It stays `unknown` until the
+first such fault. A brief reconnect right after a Home Assistant restart
+or update, and any disconnect the integration can already explain
+(shutdown evidence, or darkness below the twilight threshold), are never
+recorded here — only a fault classified as **Offline (fault)** updates it.
+
 ## Sensor values at night
 
 Many SolarMax inverters turn off their network interface when production ends.
@@ -301,6 +312,7 @@ in parentheses to make protocol logs and diagnostics easier to interpret.
 | Installed power | `PIN` | W |
 | Alarm | `SAL` | Translated alarm state and active alarm details |
 | Status Code | `SYS` | Translated inverter or connection state |
+| Last Connection Fault | — (synthetic) | Timestamp; see [Last Connection Fault](#last-connection-fault) |
 
 ### Optional diagnostic entities
 

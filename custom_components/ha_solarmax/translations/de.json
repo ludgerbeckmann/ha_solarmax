@@ -373,6 +373,9 @@
           "offline_fault": "Offline (Störung)",
           "unknown": "Unbekannt"
         }
+      },
+      "last_connection_fault": {
+        "name": "Letzter Verbindungsfehler"
       }
     }
   }

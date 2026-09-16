@@ -373,6 +373,9 @@
           "multiple_alarms": "Multiple alarms",
           "unknown_alarm": "Unknown alarm"
         }
+      },
+      "last_connection_fault": {
+        "name": "Last Connection Fault"
       }
     }
   }

@@ -373,6 +373,9 @@
           "offline_fault": "Hors ligne (défaut)",
           "unknown": "Inconnu"
         }
+      },
+      "last_connection_fault": {
+        "name": "Dernière erreur de connexion"
       }
     }
   }
