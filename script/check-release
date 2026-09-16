@@ -61,7 +61,7 @@ def _is_forbidden_archive_path(name: str) -> bool:
     path = PurePosixPath(name)
     if name.startswith("/") or "\\" in name:
         return True
-    if not path.parts or path.parts[0] == "solarmax" or ".." in path.parts:
+    if not path.parts or path.parts[0] == "ha_solarmax" or ".." in path.parts:
         return True
     if any(part.startswith(".") for part in path.parts):
         return True
@@ -118,7 +118,7 @@ def main() -> int:
     root = Path(__file__).resolve().parent.parent
     with (root / "pyproject.toml").open("rb") as handle:
         project_version = tomllib.load(handle)["project"]["version"]
-    with (root / "custom_components" / "solarmax" / "manifest.json").open(
+    with (root / "custom_components" / "ha_solarmax" / "manifest.json").open(
         encoding="utf-8"
     ) as handle:
         manifest_version = json.load(handle)["version"]

@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-16
+
+### Changed
+
+- Aligned `manifest.json`'s `name` with `hacs.json` ("Solarmax Inverter
+  Integration") so the integration shows the same name everywhere.
+
+## [0.2.0] - 2026-09-16
+
+### Changed
+
+- **Breaking:** renamed the integration folder and domain from `solarmax` to
+  `ha_solarmax` (`custom_components/solarmax` → `custom_components/ha_solarmax`,
+  `manifest.json` `domain` and the `DOMAIN` constant updated to match). Any
+  existing installation must remove and re-add the integration; entity unique
+  IDs and the config entry are tied to the old domain and cannot migrate
+  automatically.
+- Updated the release workflow, `hacs.json`, and documentation to build and
+  reference `ha_solarmax.zip` instead of `solarmax.zip`.
+
 ## [0.1.2] - 2026-09-15
 
 ### Changed
@@ -54,7 +74,9 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/ludgerbeckmann/ha_solarmax/releases/tag/v0.1.0

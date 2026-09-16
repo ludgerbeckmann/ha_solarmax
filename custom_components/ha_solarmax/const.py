@@ -9,7 +9,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.helpers.entity import EntityCategory
 
-DOMAIN = "solarmax"
+DOMAIN = "ha_solarmax"
 
 # Configuration constants
 CONF_HOST = "host"

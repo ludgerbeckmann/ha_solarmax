@@ -116,7 +116,7 @@ def main() -> int:
 
         root = args.root.resolve()
         project_path = root / "pyproject.toml"
-        manifest_path = root / "custom_components" / "solarmax" / "manifest.json"
+        manifest_path = root / "custom_components" / "ha_solarmax" / "manifest.json"
         changelog_path = root / "CHANGELOG.md"
 
         project_text = project_path.read_text(encoding="utf-8")

@@ -63,11 +63,11 @@ HACS handles updates after the custom repository has been added.
 
 ### Manual installation
 
-1. Download `solarmax.zip` from the latest
+1. Download `ha_solarmax.zip` from the latest
    [GitHub release](https://github.com/ludgerbeckmann/ha_solarmax/releases/).
-2. Create `custom_components/solarmax` in the Home Assistant configuration
+2. Create `custom_components/ha_solarmax` in the Home Assistant configuration
    directory and extract the archive there.
-3. Confirm that `custom_components/solarmax/manifest.json` exists.
+3. Confirm that `custom_components/ha_solarmax/manifest.json` exists.
 4. Restart Home Assistant.
 
 ## Set up and configure

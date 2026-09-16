@@ -11,4 +11,4 @@ else
 fi
 
 "$python_cmd" -m ruff check .
-"$python_cmd" -m mypy custom_components/solarmax
+"$python_cmd" -m mypy custom_components/ha_solarmax

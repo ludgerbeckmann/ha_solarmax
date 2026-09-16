@@ -50,7 +50,7 @@ Enable debug logging in `configuration.yaml`:
 ```yaml
 logger:
   logs:
-    custom_components.solarmax: debug
+    custom_components.ha_solarmax: debug
 ```
 
 Restart Home Assistant or reload logging, reproduce the issue, then download diagnostics from the Solarmax integration page.
