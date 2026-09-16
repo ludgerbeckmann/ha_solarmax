@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-09-16
+
+### Fixed
+
+- Recolored `custom_components/ha_solarmax/brand/icon.png` and `icon@2x.png`
+  from black-on-yellow to the actual SolarMax brand colors (orange/gray),
+  matching the mark as printed on the inverters themselves. Both were
+  regenerated directly from the mark in `logo.png` rather than hand-picked,
+  so the colors match the real logo exactly. This only affects this
+  repository's own copy — the icon Home Assistant's UI and HACS actually
+  display comes from the separate `home-assistant/brands` repository (see
+  `CONTRIBUTING.md`), so getting the corrected icon to show up there needs
+  its own PR against that repo.
+
 ## [0.5.2] - 2026-09-16
 
 ### Changed
@@ -234,7 +248,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.2...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.3...HEAD
+[0.5.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.4...v0.5.0
