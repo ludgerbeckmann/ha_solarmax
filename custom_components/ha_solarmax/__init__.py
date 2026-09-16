@@ -125,7 +125,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: SolarmaxConfigEntry) -> 
             try:
                 await coordinator.async_shutdown()
             finally:
-                await coordinator.engine.close()
+                await coordinator.async_close()
         finally:
             if getattr(entry, "runtime_data", None) is coordinator:
                 object.__delattr__(entry, "runtime_data")
@@ -138,9 +138,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: SolarmaxConfigEntry) ->
 
     Keep the engine usable if platform teardown fails and Home Assistant
     leaves the config entry loaded. A successful teardown is followed by
-    terminal engine close, which drains any poll still in flight.
+    releasing this entry's (possibly shared) link, which drains any poll
+    still in flight and terminally closes the link once no sibling entry
+    on the same host:port still needs it.
     """
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
-        await entry.runtime_data.engine.close()
+        await entry.runtime_data.async_close()
     return unload_ok

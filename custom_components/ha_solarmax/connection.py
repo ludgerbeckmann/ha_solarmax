@@ -119,14 +119,26 @@ class _PeerClosed(Exception):
 
 
 class SolarmaxLink:
-    """Persistent async TCP transport to a single SolarMax inverter.
+    """Persistent async TCP transport to one host:port endpoint.
 
-    The device serves exactly one TCP client and FINs idle connections at
-    ~100 s. `request()` reuses one connection across calls, transparently
+    The endpoint serves exactly one TCP client and FINs idle connections at
+    ~100 s -- true of a single inverter, and also of a MaxComm gateway that
+    exposes several inverters (bus addresses 1-249) through one Ethernet
+    connection. `configuration.acquire_endpoint_link()` shares one instance
+    across every config entry on the same host:port for exactly that reason:
+    two entries opening their own connection to the same gateway would be a
+    second concurrent client, which the endpoint may simply refuse or bounce
+    the first one for.
+
+    `request()` reuses one connection across calls, transparently
     reconnecting-and-resending once if the peer has closed it; any timeout
     (connect or response) raises `LinkTimeout` with no internal retry. No
     raw `OSError` is ever allowed to cross this boundary — an escaped
-    exception would flip HA's `last_update_success` incorrectly.
+    exception would flip HA's `last_update_success` incorrectly. Every
+    method is safe to call from multiple sharing owners concurrently:
+    `request()` calls are serialized by `_request_lock`, and `disconnect()`
+    waits for that same lock so it cannot abort another owner's in-flight
+    exchange.
     """
 
     def __init__(
@@ -179,8 +191,15 @@ class SolarmaxLink:
                 ) from err2
 
     async def disconnect(self) -> None:
-        """Drop the current transport while allowing a later reconnect."""
-        self._abort_transport()
+        """Drop the current transport while allowing a later reconnect.
+
+        Waits for `_request_lock` first: on a link shared with sibling
+        entries, an in-flight exchange may belong to one of them, not to
+        whoever is calling disconnect() for its own expected-offline period
+        or validation handoff.
+        """
+        async with self._request_lock:
+            self._abort_transport()
 
     async def close(self) -> None:
         """Terminally close the link and drain any request already in flight."""
@@ -340,7 +359,6 @@ class ConnectionEngine:
         grace_seconds: float = STARTUP_GRACE_SECONDS,
         clock: Callable[[], float] = time.monotonic,
         today: Callable[[], date] | None = None,
-        bus_lock: asyncio.Lock | None = None,
     ) -> None:
         self._link = link
         self._address = address
@@ -349,10 +367,6 @@ class ConnectionEngine:
         self._grace_seconds = grace_seconds
         self._clock = clock
         self._today = today or (lambda: datetime.now(UTC).date())
-        # Shared across every entry on the same host:port so their polls
-        # never exchange frames on that bus at the same time; defaults to a
-        # private lock when the caller has no sibling entries to guard against.
-        self._bus_lock = bus_lock or asyncio.Lock()
         self._tracker = ArmingTracker(low_pdc_watts)
         self._diagnostics = EngineDiagnostics()
         self._values: dict[str, dict[str, float | int]] = {}
@@ -368,8 +382,6 @@ class ConnectionEngine:
         self._escalation_failures = 0
         self._closed = False
         # Scheduled and debounced refreshes may overlap; the link may not.
-        # `_poll_lock` is private to this entry; `_bus_lock` (above) is the
-        # one shared with sibling entries on the same host:port.
         self._poll_lock = asyncio.Lock()
 
     async def poll(self) -> EngineSnapshot:
@@ -378,14 +390,11 @@ class ConnectionEngine:
                 return self._snapshot(
                     reconnecting=False, expected_outside_twilight=False
                 )
-            # Held outside the poll budget: time spent waiting for a sibling
-            # entry's exchange on a shared bus is not this poll timing out.
-            async with self._bus_lock:
-                try:
-                    async with asyncio.timeout(POLL_BUDGET_SECONDS):
-                        return await self._poll_inner()
-                except (TimeoutError, LinkTimeout, LinkClosed, ProtocolError):
-                    return await self._on_failure()
+            try:
+                async with asyncio.timeout(POLL_BUDGET_SECONDS):
+                    return await self._poll_inner()
+            except (TimeoutError, LinkTimeout, LinkClosed, ProtocolError):
+                return await self._on_failure()
 
     @asynccontextmanager
     async def validation_handoff(self) -> AsyncIterator[None]:
@@ -397,13 +406,19 @@ class ConnectionEngine:
             yield
 
     async def close(self) -> None:
-        """Idempotent; the last word — no poll() may touch the link again.
+        """Idempotent; the last word — no poll() may issue another request
+        after this returns.
 
-        Sets `_closed` before tearing down the link, then waits for the poll
-        lock so no active poll can issue another request after close returns.
+        Does not close the link itself: it may be shared with sibling
+        entries on the same host:port (see
+        `configuration.acquire_endpoint_link`), so tearing it down here
+        would cut them off too. Sets `_closed` first, then waits for the
+        poll lock so an in-flight poll finishes -- bounded by its own
+        timeouts and the poll budget -- before returning. The caller
+        releases the (possibly shared) link separately, once this returns,
+        via `configuration.release_endpoint_link`.
         """
         self._closed = True
-        await self._link.close()
         async with self._poll_lock:
             pass
 

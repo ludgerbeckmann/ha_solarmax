@@ -26,15 +26,15 @@ The protocol groups fields by traffic pattern:
 
 ### Link
 
-`SolarmaxLink` owns the persistent `asyncio` reader and writer. A request lock permits one exchange at a time. A peer close triggers one reconnect and resend. Terminal `close()` blocks later requests and prevents an in-flight connect from publishing a new socket.
+`SolarmaxLink` owns the persistent `asyncio` reader and writer for one host:port endpoint. A request lock permits one exchange at a time. A peer close triggers one reconnect and resend. Terminal `close()` blocks later requests and prevents an in-flight connect from publishing a new socket.
 
-Use `disconnect()` for an expected night shutdown because the engine must reopen the link at dawn. Use `close()` only during entry teardown.
+Use `disconnect()` for an expected night shutdown because the engine must reopen the link at dawn. Use `close()` only during entry teardown. Both are safe to call from a sharing owner concurrently with another owner's in-flight exchange: `disconnect()` waits for the request lock before aborting, so it cannot cut off a request that belongs to someone else.
+
+A host:port endpoint is not necessarily one inverter: a MaxComm TCP gateway can expose several inverters (bus addresses 1-249) through a single Ethernet connection, and per the project's own documented constraint, such an endpoint serves exactly one TCP client. `configuration.acquire_endpoint_link()` / `release_endpoint_link()` share one `SolarmaxLink` instance, reference-counted, across every config entry on the same host:port, opening it on first use and closing it only once the last entry releases it. This is why `ConnectionEngine.close()` never closes the link itself — the owner (`SolarmaxCoordinator.async_close()`) releases it separately, after the engine has quiesced. `validate_connection()` (config flow and repairs) acquires the same shared link for its probe rather than opening a second connection, so it is naturally serialized against sibling polls by the link's own request lock and never becomes a second concurrent client of the endpoint.
 
 ### Connection engine
 
-`ConnectionEngine` serializes polls, enforces the 15-second poll budget, caches values, retries a timeout or corrupt frame once, and returns an `EngineSnapshot`. Link and protocol failures become snapshot state instead of escaping to the coordinator.
-
-Each engine holds two locks. `_poll_lock` is private to its own config entry and only guards against that entry's own overlapping scheduled/debounced refreshes. `_bus_lock` is shared, via `configuration.endpoint_bus_lock()`, by every config entry with the same host:port — multiple inverters reached through one MaxComm TCP gateway sit on one shared bus behind it, and their independent per-entry poll schedules would otherwise be free to exchange frames on that bus at the same moment. `poll()` acquires `_bus_lock` outside the 15-second poll budget so time spent queued behind a sibling entry's exchange never counts as this poll timing out. `validate_connection()` (config flow and repairs) takes the same lock around its probe request for the same reason.
+`ConnectionEngine` serializes polls for its own config entry via `_poll_lock`, enforces the 15-second poll budget, caches values, retries a timeout or corrupt frame once, and returns an `EngineSnapshot`. Link and protocol failures become snapshot state instead of escaping to the coordinator. Its link may be shared with sibling entries (see "Link" above); the engine itself only ever reasons about its own poll cycle.
 
 The engine classifies state from current observations:
 

@@ -21,8 +21,13 @@ from homeassistant.helpers.issue_registry import (
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
 
-from .configuration import endpoint_bus_lock, endpoint_unique_id, entry_option
-from .connection import ConnectionEngine, EngineSnapshot, EngineState, SolarmaxLink
+from .configuration import (
+    acquire_endpoint_link,
+    endpoint_unique_id,
+    entry_option,
+    release_endpoint_link,
+)
+from .connection import ConnectionEngine, EngineSnapshot, EngineState
 from .const import (
     CONF_ADDRESS,
     CONF_HOST,
@@ -69,16 +74,17 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         """Initialize the coordinator."""
         self._entry = entry
+        self._host = entry.data[CONF_HOST]
+        self._port = entry.data[CONF_PORT]
         self._endpoint_unique_id = endpoint_unique_id(
-            entry.data[CONF_HOST],
-            entry.data[CONF_PORT],
+            self._host,
+            self._port,
             entry.data.get(CONF_ADDRESS, DEFAULT_ADDRESS),
         )
 
-        link = SolarmaxLink(
-            host=entry.data[CONF_HOST],
-            port=entry.data[CONF_PORT],
-        )
+        # Shared with any sibling entry already on this host:port -- see
+        # acquire_endpoint_link() -- released in async_close().
+        link = acquire_endpoint_link(hass, self._host, self._port)
         self._engine = ConnectionEngine(
             link,
             address=entry.data.get(CONF_ADDRESS, DEFAULT_ADDRESS),
@@ -87,9 +93,6 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
                 entry, CONF_VERIFY_CHECKSUM, DEFAULT_VERIFY_CHECKSUM
             ),
             today=lambda: dt_util.now().date(),
-            bus_lock=endpoint_bus_lock(
-                hass, entry.data[CONF_HOST], entry.data[CONF_PORT]
-            ),
         )
 
         self._configured_interval = timedelta(
@@ -114,6 +117,16 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
     def engine(self) -> ConnectionEngine:
         """Return the underlying connection engine."""
         return self._engine
+
+    async def async_close(self) -> None:
+        """Tear down this entry's engine and release its (shared) link.
+
+        Order matters: `engine.close()` first quiesces this entry -- no
+        poll of ours still running -- before we release the link, since
+        releasing may be the last reference and terminally close it.
+        """
+        await self._engine.close()
+        await release_endpoint_link(self.hass, self._host, self._port)
 
     @property
     def sun_source(self) -> str:

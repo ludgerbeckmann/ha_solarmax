@@ -32,7 +32,7 @@ from .const import (
 )
 from .protocol import ProtocolError, build_request, parse_response
 _CONFIGURATION_LOCK = "configuration_mutation_lock"
-_ENDPOINT_BUS_LOCKS = "endpoint_bus_locks"
+_ENDPOINT_LINKS = "endpoint_links"
 _LOGGER = logging.getLogger(__name__)
 TCP_PORT_SCHEMA = vol.All(vol.Coerce(int), vol.Range(min=1, max=65535))
 CONNECTION_KEYS = (CONF_HOST, CONF_PORT, CONF_ADDRESS, CONF_DEVICE_NAME)
@@ -55,6 +55,14 @@ class CannotConnect(HomeAssistantError):
 
 class EntryReloadError(HomeAssistantError):
     """The new entry could not load and rollback was required."""
+
+
+@dataclass
+class _SharedLink:
+    """A SolarmaxLink plus how many callers currently hold it."""
+
+    link: SolarmaxLink
+    refcount: int = 0
 
 
 @dataclass(frozen=True)
@@ -178,21 +186,46 @@ def configuration_mutation_lock(hass: HomeAssistant) -> asyncio.Lock:
     return lock
 
 
-def endpoint_bus_lock(hass: HomeAssistant, host: str, port: int) -> asyncio.Lock:
-    """Return the lock serializing wire access to one host:port endpoint.
+def acquire_endpoint_link(hass: HomeAssistant, host: str, port: int) -> SolarmaxLink:
+    """Return the persistent link for one host:port, opening it on first use.
 
-    Multiple inverters reachable through the same MaxComm TCP gateway (same
-    host:port, different address) sit on one shared bus behind it. Each
-    config entry otherwise polls on its own independent schedule, so without
-    this lock two entries could exchange requests on that bus at the same
-    moment. Keyed by (host, port) only: entries never share an address too,
-    so this is exactly the set that shares physical wiring.
+    A SolarMax gateway serves a single TCP client. When several inverters
+    sit behind the same gateway (same host:port, different address), every
+    config entry must reuse this one connection instead of opening its own,
+    or the gateway would see more than one concurrent client -- which is
+    exactly the failure this integration must not cause, independent of
+    whether requests on it are also serialized. Keyed by (host, port) only:
+    entries never share an address too, so this is exactly the set that
+    shares physical wiring.
+
+    Callers must release with `release_endpoint_link()` exactly once per
+    acquire, once they no longer need the connection.
     """
-    domain_data = hass.data.setdefault(DOMAIN, {})
-    locks: dict[tuple[str, int], asyncio.Lock] = domain_data.setdefault(
-        _ENDPOINT_BUS_LOCKS, {}
+    registry: dict[tuple[str, int], _SharedLink] = hass.data.setdefault(
+        DOMAIN, {}
+    ).setdefault(_ENDPOINT_LINKS, {})
+    key = (host, port)
+    shared = registry.get(key)
+    if shared is None:
+        shared = _SharedLink(link=SolarmaxLink(host, port))
+        registry[key] = shared
+    shared.refcount += 1
+    return shared.link
+
+
+async def release_endpoint_link(hass: HomeAssistant, host: str, port: int) -> None:
+    """Undo one `acquire_endpoint_link()` call, closing the link when unused."""
+    registry: dict[tuple[str, int], _SharedLink] = hass.data.get(DOMAIN, {}).get(
+        _ENDPOINT_LINKS, {}
     )
-    return locks.setdefault((host, port), asyncio.Lock())
+    key = (host, port)
+    shared = registry.get(key)
+    if shared is None:
+        return
+    shared.refcount -= 1
+    if shared.refcount <= 0:
+        del registry[key]
+        await shared.link.close()
 
 
 def find_endpoint_conflict(
@@ -222,18 +255,19 @@ async def validate_connection(
 ) -> None:
     """Validate an endpoint with a short PAC request.
 
-    Shares `endpoint_bus_lock` so this probe cannot land on the wire at the
-    same moment as another entry's poll of the same host:port.
+    Uses `acquire_endpoint_link()`, so this probe reuses the same connection
+    as any coordinator already on this host:port instead of opening a second
+    one, and is naturally serialized against their polls by that link's own
+    request lock.
     """
-    link = SolarmaxLink(host, port)
+    link = acquire_endpoint_link(hass, host, port)
     try:
-        async with endpoint_bus_lock(hass, host, port):
-            raw = await link.request(build_request(address, ["PAC"]))
+        raw = await link.request(build_request(address, ["PAC"]))
         parse_response(raw, verify_checksum)
     except (LinkTimeout, LinkClosed, ProtocolError, OSError, UnicodeError) as err:
         raise CannotConnect from err
     finally:
-        await link.close()
+        await release_endpoint_link(hass, host, port)
 
 
 def split_entry_input(

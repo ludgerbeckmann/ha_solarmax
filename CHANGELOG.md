@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-09-16
+
+### Changed
+
+- Replaced the per-host:port bus lock (`endpoint_bus_lock`, added in 0.3.0)
+  with a shared, reference-counted `SolarmaxLink`
+  (`configuration.acquire_endpoint_link()` / `release_endpoint_link()`).
+  The bus lock only serialized requests; it did not stop two config entries
+  on the same MaxComm gateway from each holding their own persistent TCP
+  connection open at the same time. Per this project's own documented
+  constraint, a SolarMax endpoint accepts only one TCP client — if that
+  holds at the gateway level for inverters sharing one converter, two
+  simultaneously open connections could misbehave independent of whether
+  requests on them were ever sent at the same instant. Every config entry
+  on a given host:port, and `validate_connection()`'s probe, now share one
+  connection instead, opened on first use and closed only once the last
+  user releases it — serialization falls out of the link's own existing
+  request lock, so the separate bus lock is no longer needed.
+- `SolarmaxLink.disconnect()` now waits for the request lock before
+  aborting the transport, so it can no longer cut off another entry's
+  in-flight exchange on a shared link.
+
 ## [0.3.1] - 2026-09-16
 
 ### Fixed
@@ -116,7 +138,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.2.3...v0.2.4
