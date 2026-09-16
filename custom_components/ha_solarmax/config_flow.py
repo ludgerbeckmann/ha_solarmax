@@ -10,6 +10,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.core import callback
+from homeassistant.helpers import selector
 from .configuration import (
     OPTION_DEFAULTS,
     TCP_PORT_SCHEMA,
@@ -44,6 +45,17 @@ from .const import (
     DOMAIN,
 )
 _LOGGER = logging.getLogger(__name__)
+# Plain min/max int fields render as a slider in the HA frontend, which is
+# fiddly for a 1-249 range where an exact value is needed; a box-mode number
+# selector gives a typeable field with +/- steppers instead.
+_ADDRESS_SELECTOR = vol.All(
+    selector.NumberSelector(
+        selector.NumberSelectorConfig(
+            min=1, max=249, mode=selector.NumberSelectorMode.BOX
+        )
+    ),
+    vol.Coerce(int),
+)
 # Default field values for a fresh config entry. The options flow overlays the
 # entry's current values on top of these before building its schema.
 _DEFAULT_VALUES: dict[str, Any] = {
@@ -66,9 +78,9 @@ def _build_schema(values: dict[str, Any]) -> vol.Schema:
                 CONF_HOST, description={"suggested_value": values[CONF_HOST]}
             ): str,
             vol.Required(CONF_PORT, default=values[CONF_PORT]): TCP_PORT_SCHEMA,
-            vol.Optional(CONF_ADDRESS, default=values[CONF_ADDRESS]): vol.All(
-                vol.Coerce(int), vol.Range(min=1, max=249)
-            ),
+            vol.Optional(
+                CONF_ADDRESS, default=values[CONF_ADDRESS]
+            ): _ADDRESS_SELECTOR,
             vol.Optional(
                 CONF_UPDATE_INTERVAL, default=values[CONF_UPDATE_INTERVAL]
             ): vol.All(vol.Coerce(int), vol.Range(min=5, max=3600)),
@@ -184,9 +196,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 {
                     vol.Required(CONF_HOST, default=values[CONF_HOST]): str,
                     vol.Required(CONF_PORT, default=values[CONF_PORT]): TCP_PORT_SCHEMA,
-                    vol.Required(CONF_ADDRESS, default=values[CONF_ADDRESS]): vol.All(
-                        vol.Coerce(int), vol.Range(min=1, max=249)
-                    ),
+                    vol.Required(
+                        CONF_ADDRESS, default=values[CONF_ADDRESS]
+                    ): _ADDRESS_SELECTOR,
                     vol.Required(
                         CONF_DEVICE_NAME, default=values[CONF_DEVICE_NAME]
                     ): str,
