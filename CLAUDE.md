@@ -91,7 +91,8 @@ Tests.
 - **Zip-Dateiname**: `ha_solarmax_<version>.zip` (Unterstrich, kein
   Bindestrich).
 - Namensinkonsistenzen zwischen `manifest.json` und `hacs.json` vermeiden —
-  beide sollen "Solarmax Inverter Integration" heißen.
+  beide sollen "Solarmax Inverter" heißen (ohne den Zusatz "Integration" —
+  das ergibt sich in Home Assistant von selbst aus dem Kontext).
 
 ## Offener Punkt bei Chat-Ende
 

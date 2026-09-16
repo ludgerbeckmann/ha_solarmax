@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-09-16
+
+### Changed
+
+- Renamed the integration from "Solarmax Inverter Integration" to
+  "Solarmax Inverter" in `manifest.json` and `hacs.json` — Home Assistant
+  already shows it in an integrations context, so the suffix was
+  redundant.
+- **Keep sensor values overnight** now defaults to on for newly configured
+  inverters, applying the synthetic night policies out of the box instead
+  of leaving measurement entities unavailable overnight until enabled.
+  Existing entries keep their current setting; this only changes the
+  default a new entry starts with.
+
 ## [0.4.0] - 2026-09-16
 
 ### Added
@@ -152,7 +166,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.0...v0.3.1

@@ -1,5 +1,5 @@
 {
-  "name": "Solarmax Inverter Integration",
+  "name": "Solarmax Inverter",
   "content_in_root": false,
   "homeassistant": "2024.12.0"
 }

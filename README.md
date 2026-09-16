@@ -93,7 +93,7 @@ a successful check, the integration creates one device and its sensor entities.
 | Update interval | `30 s` | Normal online interval from 5 to 3600 seconds |
 | Device name | `Solarmax Inverter` | Device name shown in Home Assistant |
 | Verify response checksum | On | Reject responses with an invalid MaxComm checksum |
-| Keep sensor values overnight | Off | Apply the synthetic night policies described below |
+| Keep sensor values overnight | On | Apply the synthetic night policies described below |
 | Twilight elevation threshold | `5°` | Sun elevation below which an offline inverter is expected |
 
 ### Change settings later
@@ -254,11 +254,11 @@ Many SolarMax inverters turn off their network interface when production ends.
 That is normal, but it leaves Home Assistant without a live value until the
 next successful poll.
 
-To enable night values:
+New inverters are set up with this enabled by default. To change it:
 
 1. Open **Settings → Devices & services**.
 2. Find **Solarmax Inverter** and select **Configure**.
-3. Enable **Keep sensor values overnight** and save.
+3. Toggle **Keep sensor values overnight** and save.
 
 With this option disabled, measurement entities become unavailable while the
 inverter is offline. When enabled, the integration applies a policy suited to
