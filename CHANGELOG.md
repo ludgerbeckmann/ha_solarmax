@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-16
+
+### Added
+
+- A cross-entry lock (`configuration.endpoint_bus_lock()`) serializing wire
+  access per host:port. Multiple inverters reached through the same MaxComm
+  TCP gateway (same host:port, different address) sit on one shared bus
+  behind it; each config entry previously polled on its own independent
+  schedule with no coordination between entries, so two inverters could end
+  up exchanging requests on that bus at the same moment. `ConnectionEngine`
+  and `validate_connection()` (config flow and repairs) now share this lock
+  for any entries pointing at the same host:port.
+
+## [0.2.4] - 2026-09-16
+
+### Fixed
+
+- Fixed a `KeyError: 'host'` crash when opening the "Repair inverter
+  connection" dialog from Repairs. Home Assistant's flow manager re-passes
+  the repair flow's creation payload (`{"issue_id": ...}`) as `user_input`
+  on the very first call to `async_step_init`, which the flow mistook for a
+  submitted host/port form and tried to process directly. The initial step
+  now unconditionally hands off to a dedicated `async_step_confirm` step
+  before ever looking at submitted data.
+
 ## [0.2.3] - 2026-09-16
 
 ### Changed
@@ -82,7 +107,9 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.2.3...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.2.4...v0.3.0
+[0.2.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.2.1...v0.2.3
 [0.2.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.1.2...v0.2.0

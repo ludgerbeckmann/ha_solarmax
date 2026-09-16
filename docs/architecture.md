@@ -34,6 +34,8 @@ Use `disconnect()` for an expected night shutdown because the engine must reopen
 
 `ConnectionEngine` serializes polls, enforces the 15-second poll budget, caches values, retries a timeout or corrupt frame once, and returns an `EngineSnapshot`. Link and protocol failures become snapshot state instead of escaping to the coordinator.
 
+Each engine holds two locks. `_poll_lock` is private to its own config entry and only guards against that entry's own overlapping scheduled/debounced refreshes. `_bus_lock` is shared, via `configuration.endpoint_bus_lock()`, by every config entry with the same host:port — multiple inverters reached through one MaxComm TCP gateway sit on one shared bus behind it, and their independent per-entry poll schedules would otherwise be free to exchange frames on that bus at the same moment. `poll()` acquires `_bus_lock` outside the 15-second poll budget so time spent queued behind a sibling entry's exchange never counts as this poll timing out. `validate_connection()` (config flow and repairs) takes the same lock around its probe request for the same reason.
+
 The engine classifies state from current observations:
 
 | Observation | Result |

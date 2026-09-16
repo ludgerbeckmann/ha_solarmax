@@ -340,6 +340,7 @@ class ConnectionEngine:
         grace_seconds: float = STARTUP_GRACE_SECONDS,
         clock: Callable[[], float] = time.monotonic,
         today: Callable[[], date] | None = None,
+        bus_lock: asyncio.Lock | None = None,
     ) -> None:
         self._link = link
         self._address = address
@@ -348,6 +349,10 @@ class ConnectionEngine:
         self._grace_seconds = grace_seconds
         self._clock = clock
         self._today = today or (lambda: datetime.now(UTC).date())
+        # Shared across every entry on the same host:port so their polls
+        # never exchange frames on that bus at the same time; defaults to a
+        # private lock when the caller has no sibling entries to guard against.
+        self._bus_lock = bus_lock or asyncio.Lock()
         self._tracker = ArmingTracker(low_pdc_watts)
         self._diagnostics = EngineDiagnostics()
         self._values: dict[str, dict[str, float | int]] = {}
@@ -363,6 +368,8 @@ class ConnectionEngine:
         self._escalation_failures = 0
         self._closed = False
         # Scheduled and debounced refreshes may overlap; the link may not.
+        # `_poll_lock` is private to this entry; `_bus_lock` (above) is the
+        # one shared with sibling entries on the same host:port.
         self._poll_lock = asyncio.Lock()
 
     async def poll(self) -> EngineSnapshot:
@@ -371,11 +378,14 @@ class ConnectionEngine:
                 return self._snapshot(
                     reconnecting=False, expected_outside_twilight=False
                 )
-            try:
-                async with asyncio.timeout(POLL_BUDGET_SECONDS):
-                    return await self._poll_inner()
-            except (TimeoutError, LinkTimeout, LinkClosed, ProtocolError):
-                return await self._on_failure()
+            # Held outside the poll budget: time spent waiting for a sibling
+            # entry's exchange on a shared bus is not this poll timing out.
+            async with self._bus_lock:
+                try:
+                    async with asyncio.timeout(POLL_BUDGET_SECONDS):
+                        return await self._poll_inner()
+                except (TimeoutError, LinkTimeout, LinkClosed, ProtocolError):
+                    return await self._on_failure()
 
     @asynccontextmanager
     async def validation_handoff(self) -> AsyncIterator[None]:

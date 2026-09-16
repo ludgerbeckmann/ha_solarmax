@@ -32,6 +32,7 @@ from .const import (
 )
 from .protocol import ProtocolError, build_request, parse_response
 _CONFIGURATION_LOCK = "configuration_mutation_lock"
+_ENDPOINT_BUS_LOCKS = "endpoint_bus_locks"
 _LOGGER = logging.getLogger(__name__)
 TCP_PORT_SCHEMA = vol.All(vol.Coerce(int), vol.Range(min=1, max=65535))
 CONNECTION_KEYS = (CONF_HOST, CONF_PORT, CONF_ADDRESS, CONF_DEVICE_NAME)
@@ -177,6 +178,23 @@ def configuration_mutation_lock(hass: HomeAssistant) -> asyncio.Lock:
     return lock
 
 
+def endpoint_bus_lock(hass: HomeAssistant, host: str, port: int) -> asyncio.Lock:
+    """Return the lock serializing wire access to one host:port endpoint.
+
+    Multiple inverters reachable through the same MaxComm TCP gateway (same
+    host:port, different address) sit on one shared bus behind it. Each
+    config entry otherwise polls on its own independent schedule, so without
+    this lock two entries could exchange requests on that bus at the same
+    moment. Keyed by (host, port) only: entries never share an address too,
+    so this is exactly the set that shares physical wiring.
+    """
+    domain_data = hass.data.setdefault(DOMAIN, {})
+    locks: dict[tuple[str, int], asyncio.Lock] = domain_data.setdefault(
+        _ENDPOINT_BUS_LOCKS, {}
+    )
+    return locks.setdefault((host, port), asyncio.Lock())
+
+
 def find_endpoint_conflict(
     hass: HomeAssistant,
     host: str,
@@ -200,12 +218,17 @@ def find_endpoint_conflict(
 
 
 async def validate_connection(
-    *, host: str, port: int, address: int, verify_checksum: bool
+    hass: HomeAssistant, *, host: str, port: int, address: int, verify_checksum: bool
 ) -> None:
-    """Validate an endpoint with a short PAC request."""
+    """Validate an endpoint with a short PAC request.
+
+    Shares `endpoint_bus_lock` so this probe cannot land on the wire at the
+    same moment as another entry's poll of the same host:port.
+    """
     link = SolarmaxLink(host, port)
     try:
-        raw = await link.request(build_request(address, ["PAC"]))
+        async with endpoint_bus_lock(hass, host, port):
+            raw = await link.request(build_request(address, ["PAC"]))
         parse_response(raw, verify_checksum)
     except (LinkTimeout, LinkClosed, ProtocolError, OSError, UnicodeError) as err:
         raise CannotConnect from err

@@ -57,6 +57,17 @@ class SolarmaxConnectionRepairFlow(RepairsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> data_entry_flow.FlowResult:
+        """Hand off to the real step.
+
+        FlowManager.async_init() re-passes this flow's creation payload
+        (the issue_id dict) as `user_input` on this very first call, so it
+        must never be treated as submitted form data here.
+        """
+        return await self.async_step_confirm()
+
+    async def async_step_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> data_entry_flow.FlowResult:
         """Offer host and port and validate submitted changes."""
         entry_id = self.issue_id.removeprefix("connection_issues_")
         entry = self.hass.config_entries.async_get_entry(entry_id)
@@ -80,7 +91,7 @@ class SolarmaxConnectionRepairFlow(RepairsFlow):
 
         values = entry.data if user_input is None else user_input
         return self.async_show_form(
-            step_id="init",
+            step_id="confirm",
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_HOST, default=values[CONF_HOST]): str,
@@ -139,6 +150,7 @@ class SolarmaxConnectionRepairFlow(RepairsFlow):
                 if registry.async_get_issue(DOMAIN, self.issue_id) is None:
                     return self.async_abort(reason="issue_missing")
                 await validate_connection(
+                    self.hass,
                     host=host,
                     port=port,
                     address=entry.data[CONF_ADDRESS],

@@ -72,7 +72,7 @@
       "title": "Wechselrichter Verbindungsprobleme",
       "fix_flow": {
         "step": {
-          "init": {
+          "confirm": {
             "title": "Wechselrichterverbindung reparieren",
             "description": "Der Wechselrichter unter {host}:{port} ist seit {minutes} Minuten tagsüber nicht erreichbar. Ändern Sie Host oder Port, um eine andere Verbindung zu prüfen.",
             "data": {
