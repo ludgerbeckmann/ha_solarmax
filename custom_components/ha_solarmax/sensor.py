@@ -9,6 +9,7 @@ from typing import Any
 from datetime import datetime
 
 from homeassistant.components.sensor import (
+    RestoreSensor,
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
@@ -139,7 +140,7 @@ def _make_device_registry_updater(
     return _update_device_registry
 
 
-class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEntity):
+class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], RestoreSensor):
     """Representation of a Solarmax sensor."""
 
     _attr_has_entity_name = True
@@ -161,6 +162,14 @@ class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEntity):
         self._night_keep_values: bool = entry_option(
             entry, CONF_NIGHT_KEEP_VALUES, DEFAULT_NIGHT_KEEP_VALUES
         )
+
+        # Filled from restored state in async_added_to_hass(); bridges the gap
+        # after a restart until the engine's in-memory cache (wiped by the
+        # restart) is repopulated by a real poll -- otherwise a HOLD-policy
+        # sensor restarted at night has nothing to hold and would show
+        # unavailable until the inverter is reachable again at sunrise.
+        self._restored_value: str | int | float | None = None
+        self._restored_attributes: dict[str, Any] = {}
 
         # No hardware identifier is available, so the unique_id falls back to the
         # config entry id per HA guidance: {entry_id}-{key}.
@@ -185,6 +194,18 @@ class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEntity):
             sw_version=coordinator.sw_version,
             serial_number=coordinator.serial_number,
         )
+
+    async def async_added_to_hass(self) -> None:
+        """Restore the last known value for the post-restart HOLD gap."""
+        await super().async_added_to_hass()
+        if (last_sensor_data := await self.async_get_last_sensor_data()) is not None:
+            self._restored_value = last_sensor_data.native_value
+        if (last_state := await self.async_get_last_state()) is not None:
+            self._restored_attributes = {
+                key: value
+                for key, value in last_state.attributes.items()
+                if key in ("raw_value", "code", "active_alarms")
+            }
 
     @staticmethod
     def _decode_sal_alarms(value: int) -> list[str]:
@@ -217,6 +238,8 @@ class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEntity):
             return "zero"
         if policy is NightPolicy.HOLD_UNTIL_MIDNIGHT and self._is_new_day():
             return "zero" if self._sensor_data() is not None else "unavailable"
+        if self._sensor_data() is None and self._restored_value is not None:
+            return "restored"
         return "hold"
 
     def _anomalous_expected(self) -> bool:
@@ -289,6 +312,8 @@ class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEntity):
             return 0
         if night_source == "unavailable":
             return None
+        if night_source == "restored":
+            return self._restored_value
         return self._decoded_value(self._sensor_value())
 
     def _offline_attributes(self) -> dict[str, Any]:
@@ -334,13 +359,16 @@ class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEntity):
             else self._reading_attributes(sensor_data, night_source)
         )
 
-    @staticmethod
-    def _synthetic_night_attributes(night_source: str | None) -> dict[str, Any] | None:
+    def _synthetic_night_attributes(
+        self, night_source: str | None
+    ) -> dict[str, Any] | None:
         """Build attributes for night values that do not come from a poll."""
         if night_source == "zero":
             return {"raw_value": 0, "night_value_source": "zero"}
         if night_source == "unavailable":
             return {"night_value_source": "unavailable"}
+        if night_source == "restored":
+            return {**self._restored_attributes, "night_value_source": "restored"}
         return None
 
     def _reading_attributes(
@@ -382,7 +410,7 @@ class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEntity):
         return self._night_source_available(self._resolved_night_source())
 
     def _night_source_available(self, night_source: str | None) -> bool:
-        if night_source == "zero":
+        if night_source in ("zero", "restored"):
             return True
         if night_source != "hold":
             return False

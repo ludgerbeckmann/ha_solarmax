@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-09-16
+
+### Fixed
+
+- A HOLD-policy night sensor (Energy yesterday/last month/last year,
+  Operating hours, Start count, Installed power, min/max voltage/
+  temperature, alarm status) now survives a Home Assistant restart that
+  happens overnight. These sensors keep showing the last known reading
+  while the inverter is expectedly offline, but that reading lived only in
+  the connection engine's in-memory cache -- wiped by any restart. A
+  restart at night therefore emptied the cache before the inverter is
+  reachable again at sunrise, and the sensor showed unavailable instead of
+  its last value for the rest of the night. `SolarmaxSensor` now extends
+  Home Assistant's `RestoreSensor`, restoring the last known value (and
+  its raw_value/code/active_alarms attributes) on startup and using it as
+  a fallback for exactly this gap, until a real poll repopulates the
+  cache. Reported as `night_value_source: restored` in the entity's
+  attributes so it's distinguishable from a live "hold" reading.
+
 ## [0.5.3] - 2026-09-16
 
 ### Fixed
@@ -248,7 +267,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.3...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.4...HEAD
+[0.5.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.0...v0.5.1
