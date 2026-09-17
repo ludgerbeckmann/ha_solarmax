@@ -237,7 +237,9 @@ class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], RestoreSensor):
                 return "zero"
             return "unavailable"
         if policy is NightPolicy.HOLD_UNTIL_MIDNIGHT and self._is_new_day():
-            return "zero" if self._sensor_data() is not None else "unavailable"
+            if self._sensor_data() is not None or self._restored_value is not None:
+                return "zero"
+            return "unavailable"
         if self._sensor_data() is None and self._restored_value is not None:
             return "restored"
         return "hold"

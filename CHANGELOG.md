@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.4] - 2026-09-17
+
+### Fixed
+
+- Energy today (`KDY`, `HOLD_UNTIL_MIDNIGHT` policy) had the same
+  restart gap just fixed for ZERO-policy sensors, in its own "past
+  midnight, reset to zero" branch: it checked only the engine's live
+  cache, not a restored value, so a restart after midnight but before
+  the next successful poll showed unavailable instead of the honest
+  zero for the new day.
+
 ## [0.6.3] - 2026-09-17
 
 ### Fixed
@@ -332,7 +343,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.3...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.4...HEAD
+[0.6.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.0...v0.6.1
