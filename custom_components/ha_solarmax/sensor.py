@@ -419,7 +419,7 @@ class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], RestoreSensor):
         return self._sensor_value() is not None
 
 
-class SolarmaxLastFaultSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEntity):
+class SolarmaxLastFaultSensor(CoordinatorEntity[SolarmaxCoordinator], RestoreSensor):
     """Timestamp of the most recent unexpected daytime connection fault.
 
     A separate, minimal class rather than another `SolarmaxSensor` key:
@@ -430,6 +430,12 @@ class SolarmaxLastFaultSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEnti
     grace period or a disconnect explained by shutdown evidence or
     darkness, so routine restarts, updates, and nightly shutdowns are
     never recorded as a fault.
+
+    `EngineDiagnostics.last_fault_started` lives only in the connection
+    engine's memory, wiped by any restart same as the night-value caches
+    `SolarmaxSensor` restores from -- without a restore here, a restart
+    would make the integration forget the last recorded fault entirely,
+    defeating the point of a durable "when did this last happen" signal.
     """
 
     _attr_has_entity_name = True
@@ -447,6 +453,7 @@ class SolarmaxLastFaultSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEnti
         super().__init__(coordinator)
         self._attr_translation_key = "last_connection_fault"
         self._attr_unique_id = f"{entry.entry_id}-last_connection_fault"
+        self._restored_value: datetime | None = None
 
         device_name_normalized = device_name.lower().replace(" ", "_").replace("-", "_")
         self.entity_id = generate_entity_id(
@@ -464,10 +471,19 @@ class SolarmaxLastFaultSensor(CoordinatorEntity[SolarmaxCoordinator], SensorEnti
             serial_number=coordinator.serial_number,
         )
 
+    async def async_added_to_hass(self) -> None:
+        """Restore the last recorded fault time across a restart."""
+        await super().async_added_to_hass()
+        last_sensor_data = await self.async_get_last_sensor_data()
+        if last_sensor_data is not None and isinstance(
+            last_sensor_data.native_value, datetime
+        ):
+            self._restored_value = last_sensor_data.native_value
+
     @property
     def native_value(self) -> datetime | None:
         """Return when the most recent unexpected daytime fault began."""
-        return self.coordinator.last_fault_started
+        return self.coordinator.last_fault_started or self._restored_value
 
 
 class SolarmaxGroupSensor(CoordinatorEntity[SolarmaxGroupCoordinator], SensorEntity):

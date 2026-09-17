@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.5] - 2026-09-17
+
+### Fixed
+
+- The **Last Connection Fault** sensor forgot its recorded timestamp on
+  every restart, not just a nightly one -- `EngineDiagnostics.last_fault_
+  started` lives only in the connection engine's memory, same as the
+  night-value caches fixed in 0.6.3/0.6.4, defeating the point of a
+  durable "when did this last happen" signal for monitoring/alerting.
+  `SolarmaxLastFaultSensor` now also extends `RestoreSensor` and falls
+  back to the restored timestamp until a real new fault (if any) replaces
+  it.
+
 ## [0.6.4] - 2026-09-17
 
 ### Fixed
@@ -343,7 +356,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.4...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.5...HEAD
+[0.6.5]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.1...v0.6.2
