@@ -295,7 +295,7 @@ class OptionsFlow(config_entries.OptionsFlow):
     ) -> ConfigFlowResult:
         """Update settings without opening a second inverter connection."""
         if self.config_entry.data.get(CONF_IS_GROUP, False):
-            return await self._async_step_group_members(user_input)
+            return await self.async_step_group_members(user_input)
         errors: dict[str, str] = {}
         if user_input is not None:
             async with configuration_mutation_lock(self.hass):
@@ -330,7 +330,7 @@ class OptionsFlow(config_entries.OptionsFlow):
             errors=errors,
         )
 
-    async def _async_step_group_members(
+    async def async_step_group_members(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Choose which configured inverters this group sums together."""

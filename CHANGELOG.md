@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-09-17
+
+### Fixed
+
+- Fixed `Handler OptionsFlow doesn't support step group_members` when
+  opening the inverter group's options (0.7.0). Home Assistant's flow
+  manager resolves a step by looking up a method literally named
+  `async_step_<step_id>` on the handler; the group's member-selection
+  step used that `step_id` but was implemented as a private
+  `_async_step_group_members()` helper instead, so HA couldn't find it.
+  Renamed to `async_step_group_members()` to match.
+
 ## [0.7.0] - 2026-09-17
 
 ### Added
@@ -367,7 +379,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.5...v0.7.0
 [0.6.5]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.3...v0.6.4
