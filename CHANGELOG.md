@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-09-17
+
+### Fixed
+
+- ZERO-policy night sensors (AC power, DC power, relative power, currents,
+  voltages) still showed unavailable after a Home Assistant restart at
+  night, the same gap 0.5.4 fixed for HOLD-policy sensors but missed here:
+  the ZERO branch returned "unavailable" whenever the engine's cache had
+  nothing yet, without checking for a restored value first. It now treats
+  a restored value the same way live data is treated -- as proof this
+  register exists on this inverter -- and shows the honest synthetic zero
+  instead. A register that has never reported anything (unsupported on
+  this model, or a brand new entity) is still correctly unavailable.
+
 ## [0.6.2] - 2026-09-17
 
 ### Changed
@@ -318,7 +332,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.3...HEAD
+[0.6.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.5...v0.6.0
