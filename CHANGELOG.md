@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-09-17
+
+### Changed
+
+- The Auto Release workflow now builds each GitHub release's notes from
+  that version's own `CHANGELOG.md` section instead of GitHub's
+  `generate_release_notes`. That feature lists merged pull requests since
+  the last tag, but every change here goes straight to `main` without a
+  PR, so it had nothing to list and every release body was empty except
+  for the "Full Changelog" comparison line. The changelog entries are
+  already written for this purpose, so the workflow now extracts the
+  matching version section and appends the same comparison link itself.
+
 ## [0.6.1] - 2026-09-17
 
 ### Changed
@@ -305,7 +318,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.5...v0.6.0
 [0.5.5]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.4...v0.5.5
