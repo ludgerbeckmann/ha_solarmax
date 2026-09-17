@@ -31,6 +31,7 @@ from .configuration import (
 from .connection import ConnectionEngine, EngineSnapshot, EngineState
 from .const import (
     CONF_ADDRESS,
+    CONF_GROUP_MEMBERS,
     CONF_HOST,
     CONF_IS_GROUP,
     CONF_PORT,
@@ -484,13 +485,22 @@ class SolarmaxGroupCoordinator(DataUpdateCoordinator[dict[str, float]]):
         return self._compute_sums()
 
     def _member_entries(self) -> list[ConfigEntry]:
-        """Return every loaded inverter entry other than this group."""
+        """Return every loaded, selected inverter entry other than this group.
+
+        `CONF_GROUP_MEMBERS` unset means "every configured inverter" (the
+        default), matching the group's original behavior of picking up
+        added or removed inverters automatically; once a user saves an
+        explicit selection in the group's options, only those entries
+        count, same as any other multi-select.
+        """
+        selected = self._entry.options.get(CONF_GROUP_MEMBERS)
         return [
             other
             for other in self.hass.config_entries.async_entries(DOMAIN)
             if other.entry_id != self._entry.entry_id
             and not other.data.get(CONF_IS_GROUP, False)
             and other.state is ConfigEntryState.LOADED
+            and (selected is None or other.entry_id in selected)
         ]
 
     def _compute_sums(self) -> dict[str, float]:

@@ -28,7 +28,7 @@
       },
       "group": {
         "title": "Solarmax Wechselrichter-Gruppe",
-        "description": "Erstellt ein virtuelles Gerät mit einer Summen-Entität für jedes Register, das mindestens ein konfigurierter Wechselrichter liefert. Später hinzugefügte oder entfernte Wechselrichter werden automatisch berücksichtigt."
+        "description": "Erstellt ein virtuelles Gerät mit einer Summen-Entität für jedes Register, das mindestens ein konfigurierter Wechselrichter liefert. Standardmäßig sind alle Wechselrichter enthalten; welche berücksichtigt werden, lässt sich später in den Optionen der Gruppe ändern."
       },
       "reconfigure": {
         "title": "Wechselrichterverbindung ändern",
@@ -75,13 +75,17 @@
         "data_description": {
           "twilight_elevation_threshold": "Sonnenhöhenwinkel, unterhalb dessen eine unangekündigte Verbindungstrennung als erwartet gilt (startet außerdem die schnellere Abfrage in der Dämmerung)."
         }
+      },
+      "group_members": {
+        "title": "Solarmax Wechselrichter-Gruppe",
+        "description": "Wähle aus, welche konfigurierten Wechselrichter in dieser Gruppe summiert werden. Standardmäßig sind alle enthalten.",
+        "data": {
+          "group_members": "Zu berücksichtigende Wechselrichter"
+        }
       }
     },
     "error": {
       "reload_failed": "Home Assistant konnte die neue Verbindung nicht aktivieren. Die vorherigen Einstellungen wurden wiederhergestellt."
-    },
-    "abort": {
-      "group_not_configurable": "Die Wechselrichter-Gruppe hat keine Optionen"
     }
   },
   "issues": {

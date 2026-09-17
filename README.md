@@ -127,11 +127,13 @@ choose **Solarmax Inverter** again, and pick **Add the inverter group**
 instead of adding another device. This creates one virtual device with a sum
 entity for every register reported by at least one configured inverter (for
 example, a combined AC Power across all inverters). Only one group can exist.
-Inverters added or removed later are picked up automatically, without
-reconfiguring the group. A register missing or unavailable on one inverter is
-left out of that register's sum rather than making the whole sum unavailable;
-a sum entity itself is only unavailable when no inverter currently reports
-that register at all.
+By default every configured inverter counts, and one added or removed later
+is picked up automatically without reconfiguring the group; use the group's
+own **Configure** (gear icon) to limit the sum to a specific selection of
+inverters instead. A register missing or unavailable on one included inverter
+is left out of that register's sum rather than making the whole sum
+unavailable; a sum entity itself is only unavailable when no included
+inverter currently reports that register at all.
 
 ### Checksum verification
 

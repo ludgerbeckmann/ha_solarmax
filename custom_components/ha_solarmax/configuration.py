@@ -18,6 +18,7 @@ from .const import (
     CONF_ADDRESS,
     CONF_DEVICE_NAME,
     CONF_HOST,
+    CONF_IS_GROUP,
     CONF_NIGHT_KEEP_VALUES,
     CONF_PORT,
     CONF_TWILIGHT_ELEVATION_THRESHOLD,
@@ -248,6 +249,15 @@ def find_endpoint_conflict(
         ),
         None,
     )
+
+
+def inverter_entries(hass: HomeAssistant) -> list[ConfigEntry]:
+    """Return every configured inverter entry (any state), excluding the group."""
+    return [
+        entry
+        for entry in hass.config_entries.async_entries(DOMAIN)
+        if not entry.data.get(CONF_IS_GROUP, False)
+    ]
 
 
 async def validate_connection(

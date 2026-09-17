@@ -28,7 +28,7 @@
       },
       "group": {
         "title": "Solarmax Inverter Group",
-        "description": "Creates one virtual device with a sum entity for every register reported by at least one configured inverter. Inverters added or removed later are picked up automatically."
+        "description": "Creates one virtual device with a sum entity for every register reported by at least one configured inverter. By default every inverter is included; which ones count can be changed later in the group's options."
       },
       "reconfigure": {
         "title": "Change inverter connection",
@@ -75,13 +75,17 @@
         "data_description": {
           "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling)."
         }
+      },
+      "group_members": {
+        "title": "Solarmax Inverter Group",
+        "description": "Choose which configured inverters are summed into this group. All of them are included by default.",
+        "data": {
+          "group_members": "Inverters to include"
+        }
       }
     },
     "error": {
       "reload_failed": "Home Assistant could not activate the new connection. The previous settings were restored."
-    },
-    "abort": {
-      "group_not_configurable": "The inverter group has no options to configure"
     }
   },
   "issues": {

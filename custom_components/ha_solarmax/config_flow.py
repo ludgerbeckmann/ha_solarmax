@@ -21,6 +21,7 @@ from .configuration import (
     endpoint_unique_id,
     entry_option,
     find_endpoint_conflict,
+    inverter_entries,
     split_entry_input,
     update_device_name,
     validate_connection,
@@ -29,6 +30,7 @@ from .configuration import (
 from .const import (
     CONF_ADDRESS,
     CONF_DEVICE_NAME,
+    CONF_GROUP_MEMBERS,
     CONF_HOST,
     CONF_IS_GROUP,
     CONF_NIGHT_KEEP_VALUES,
@@ -293,7 +295,7 @@ class OptionsFlow(config_entries.OptionsFlow):
     ) -> ConfigFlowResult:
         """Update settings without opening a second inverter connection."""
         if self.config_entry.data.get(CONF_IS_GROUP, False):
-            return self.async_abort(reason="group_not_configurable")
+            return await self._async_step_group_members(user_input)
         errors: dict[str, str] = {}
         if user_input is not None:
             async with configuration_mutation_lock(self.hass):
@@ -325,5 +327,58 @@ class OptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="init",
             data_schema=_build_options_schema(values),
+            errors=errors,
+        )
+
+    async def _async_step_group_members(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose which configured inverters this group sums together."""
+        entry = self.config_entry
+        all_ids = [member.entry_id for member in inverter_entries(self.hass)]
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            options = dict(entry.options)
+            if user_input == options:
+                return self.async_create_entry(title="", data=None)  # type: ignore[arg-type]
+            async with configuration_mutation_lock(self.hass):
+                try:
+                    await async_apply_and_reload(
+                        self.hass,
+                        entry,
+                        data=dict(entry.data),
+                        options=user_input,
+                        title=entry.title,
+                        unique_id=entry.unique_id,
+                    )
+                except EntryReloadError:
+                    errors["base"] = "reload_failed"
+                else:
+                    return self.async_create_entry(title="", data=user_input)
+        selected = entry_option(entry, CONF_GROUP_MEMBERS, all_ids)
+        selected = [entry_id for entry_id in selected if entry_id in all_ids]
+        return self.async_show_form(
+            step_id="group_members",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_GROUP_MEMBERS, default=selected
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=[
+                                selector.SelectOptionDict(
+                                    value=member.entry_id,
+                                    label=member.data.get(
+                                        CONF_DEVICE_NAME, member.title
+                                    ),
+                                )
+                                for member in inverter_entries(self.hass)
+                            ],
+                            multiple=True,
+                            mode=selector.SelectSelectorMode.LIST,
+                        )
+                    ),
+                }
+            ),
             errors=errors,
         )

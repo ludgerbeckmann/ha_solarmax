@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-17
+
+### Added
+
+- An options step for the inverter group (its own gear icon → **Configure**)
+  to choose which configured inverters are summed into it. All of them are
+  selected by default, matching the group's previous behavior; saving an
+  explicit selection limits the sums to just those inverters, and a newly
+  added inverter joins automatically only while no explicit selection has
+  been saved yet.
+
 ## [0.6.5] - 2026-09-17
 
 ### Fixed
@@ -356,7 +367,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.5...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.5...v0.7.0
 [0.6.5]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.2...v0.6.3

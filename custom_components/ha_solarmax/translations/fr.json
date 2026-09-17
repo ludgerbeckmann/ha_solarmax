@@ -28,7 +28,7 @@
       },
       "group": {
         "title": "Groupe d'onduleurs Solarmax",
-        "description": "Crée un appareil virtuel avec une entité de somme pour chaque registre fourni par au moins un onduleur configuré. Les onduleurs ajoutés ou supprimés ultérieurement sont pris en compte automatiquement."
+        "description": "Crée un appareil virtuel avec une entité de somme pour chaque registre fourni par au moins un onduleur configuré. Tous les onduleurs sont inclus par défaut ; ceux pris en compte peuvent être modifiés ensuite dans les options du groupe."
       },
       "reconfigure": {
         "title": "Modifier la connexion de l'onduleur",
@@ -75,13 +75,17 @@
         "data_description": {
           "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube)."
         }
+      },
+      "group_members": {
+        "title": "Groupe d'onduleurs Solarmax",
+        "description": "Choisissez quels onduleurs configurés sont additionnés dans ce groupe. Tous sont inclus par défaut.",
+        "data": {
+          "group_members": "Onduleurs à inclure"
+        }
       }
     },
     "error": {
       "reload_failed": "Home Assistant n'a pas pu activer la nouvelle connexion. Les paramètres précédents ont été restaurés."
-    },
-    "abort": {
-      "group_not_configurable": "Le groupe d'onduleurs n'a aucune option à configurer"
     }
   },
   "issues": {

@@ -21,6 +21,8 @@ CONF_VERIFY_CHECKSUM = "verify_checksum"
 CONF_TWILIGHT_ELEVATION_THRESHOLD = "twilight_elevation_threshold"
 CONF_NIGHT_KEEP_VALUES = "night_keep_values"
 CONF_IS_GROUP = "is_group"
+# Entry IDs of the inverters to sum into the group; unset means "all of them".
+CONF_GROUP_MEMBERS = "group_members"
 
 # Default values
 DEFAULT_PORT = 12345
