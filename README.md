@@ -376,6 +376,12 @@ with, endorsed by, sponsored by, or supported by SolarMax or any related
 company, distributor, installer, or rights holder. Product and company names
 are trademarks of their respective owners.
 
+## Credits
+
+This project started as a fork of
+[oschick/solarmax-ha-integration](https://github.com/oschick/solarmax-ha-integration)
+by Ole Schicketanz.
+
 ## License
 
 This project is licensed under the [MIT License](https://github.com/ludgerbeckmann/ha_solarmax/blob/main/LICENSE).

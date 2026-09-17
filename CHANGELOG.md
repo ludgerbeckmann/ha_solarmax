@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-17
+
+### Added
+
+- A "Credits" section in the README crediting the original project this
+  fork started from (`oschick/solarmax-ha-integration` by Ole
+  Schicketanz). The repository's early history was uploaded rather than
+  created via GitHub's own Fork button, so GitHub shows no automatic
+  "forked from" link on the repo page; until now, the only place the
+  origin was recorded at all was the copyright line in `LICENSE`, which a
+  README/HACS visitor is unlikely to ever open.
+
 ## [0.5.5] - 2026-09-17
 
 ### Fixed
@@ -283,7 +295,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.5...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.5...v0.6.0
 [0.5.5]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.4...v0.5.5
 [0.5.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.2...v0.5.3
