@@ -3,7 +3,7 @@
 [![Validate](https://github.com/ludgerbeckmann/ha_solarmax/actions/workflows/validate.yml/badge.svg)](https://github.com/ludgerbeckmann/ha_solarmax/actions/workflows/validate.yml)
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 [![GitHub release](https://img.shields.io/github/release/ludgerbeckmann/ha_solarmax.svg)](https://github.com/ludgerbeckmann/ha_solarmax/releases/)
-[![GitHub license](https://img.shields.io/github/license/ludgerbeckmann/ha_solarmax.svg)](LICENSE)
+[![GitHub license](https://img.shields.io/github/license/ludgerbeckmann/ha_solarmax.svg)](https://github.com/ludgerbeckmann/ha_solarmax/blob/main/LICENSE)
 
 Solarmax Inverter connects Home Assistant directly to a SolarMax inverter over
 the MaxComm TCP protocol on your local network. It reads production, energy
@@ -378,4 +378,4 @@ are trademarks of their respective owners.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](https://github.com/ludgerbeckmann/ha_solarmax/blob/main/LICENSE).

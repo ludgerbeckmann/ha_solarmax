@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.5] - 2026-09-17
+
+### Fixed
+
+- The GitHub license badge in the README rendered as a broken image inside
+  Home Assistant's own documentation panel (Settings → Devices & Services
+  → Solarmax Inverter). Its markdown was `[![...](https://img.shields.io/
+  ...)](LICENSE)` — an absolute image URL wrapped in a *relative* link.
+  Home Assistant's markdown renderer rewrites relative links to
+  `raw.githubusercontent.com/<owner>/<repo>/<version>/<path>`, but mishandled
+  this combination and concatenated that prefix onto the already-absolute
+  image URL instead of leaving it alone. Every other badge in the README
+  already uses an absolute link and was unaffected. Made the license
+  badge's link (and the plain `LICENSE` link in the License section)
+  absolute too, matching the others.
+
 ## [0.5.4] - 2026-09-16
 
 ### Fixed
@@ -267,7 +283,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.4...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.5...HEAD
+[0.5.5]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.4...v0.5.5
 [0.5.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.5.1...v0.5.2
