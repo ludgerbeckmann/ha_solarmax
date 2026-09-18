@@ -9,7 +9,7 @@ from typing import Any
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import selector
 from .configuration import (
     OPTION_DEFAULTS,
@@ -61,10 +61,32 @@ _ADDRESS_SELECTOR = vol.All(
     ),
     vol.Coerce(int),
 )
+# Localized suggested device names, keyed by the first segment of
+# hass.config.language (e.g. "de" for "de" or "de-DE"). DEFAULT_DEVICE_NAME /
+# DEFAULT_GROUP_DEVICE_NAME (English) is the fallback for any other language.
+_LOCALIZED_DEVICE_NAMES: dict[str, str] = {"de": "Wechselrichter", "fr": "Onduleur"}
+_LOCALIZED_GROUP_DEVICE_NAMES: dict[str, str] = {
+    "de": "Wechselrichtergruppe",
+    "fr": "Groupe d'onduleurs",
+}
+
+
+def _localized_device_name(hass: HomeAssistant) -> str:
+    """Suggest a device name in the user's configured language, if known."""
+    language = hass.config.language.split("-")[0].lower()
+    return _LOCALIZED_DEVICE_NAMES.get(language, DEFAULT_DEVICE_NAME)
+
+
+def _localized_group_device_name(hass: HomeAssistant) -> str:
+    """Suggest the group's device name in the user's configured language."""
+    language = hass.config.language.split("-")[0].lower()
+    return _LOCALIZED_GROUP_DEVICE_NAMES.get(language, DEFAULT_GROUP_DEVICE_NAME)
+
+
 # Default field values for a fresh config entry. The options flow overlays the
 # entry's current values on top of these before building its schema.
 _DEFAULT_VALUES: dict[str, Any] = {
-    CONF_HOST: "192.168.1.100",
+    CONF_HOST: "",
     CONF_PORT: DEFAULT_PORT,
     CONF_ADDRESS: DEFAULT_ADDRESS,
     CONF_UPDATE_INTERVAL: DEFAULT_UPDATE_INTERVAL,
@@ -150,12 +172,23 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         await self.async_set_unique_id(GROUP_UNIQUE_ID)
         self._abort_if_unique_id_configured()
         if user_input is not None:
+            device_name = user_input[CONF_DEVICE_NAME]
             return self.async_create_entry(
-                title=DEFAULT_GROUP_DEVICE_NAME,
-                data={CONF_IS_GROUP: True},
+                title=device_name,
+                data={CONF_IS_GROUP: True, CONF_DEVICE_NAME: device_name},
                 options={},
             )
-        return self.async_show_form(step_id="group", data_schema=vol.Schema({}))
+        return self.async_show_form(
+            step_id="group",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_DEVICE_NAME,
+                        default=_localized_group_device_name(self.hass),
+                    ): str,
+                }
+            ),
+        )
 
     async def async_step_device(
         self, user_input: dict[str, Any] | None = None
@@ -194,7 +227,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     )
         return self.async_show_form(
             step_id="device",
-            data_schema=_build_schema(_DEFAULT_VALUES),
+            data_schema=_build_schema(
+                _DEFAULT_VALUES
+                | {CONF_DEVICE_NAME: _localized_device_name(self.hass)}
+            ),
             errors=errors,
         )
 

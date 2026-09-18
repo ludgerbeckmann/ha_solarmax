@@ -87,11 +87,11 @@ a successful check, the integration creates one device and its sensor entities.
 
 | Setting | Default | Description |
 | --- | ---: | --- |
-| Host | `192.168.1.100` | Inverter IP address or host name |
+| IP address | *(none)* | Inverter IP address or host name |
 | Port | `12345` | MaxComm TCP port |
 | Inverter address | `1` | MaxComm address from 1 to 249 |
 | Update interval | `30 s` | Normal online interval from 5 to 3600 seconds |
-| Device name | `Solarmax Inverter` | Device name shown in Home Assistant |
+| Device name | `Inverter` | Device name shown in Home Assistant |
 | Verify response checksum | On | Reject responses with an invalid MaxComm checksum |
 | Keep sensor values overnight | On | Apply the synthetic night policies described below |
 | Twilight elevation threshold | `5°` | Sun elevation below which an offline inverter is expected |
@@ -102,7 +102,7 @@ The integration menu offers two actions:
 
 | Action | Use it for |
 | --- | --- |
-| **Reconfigure** | Host, port, inverter address, or device name |
+| **Reconfigure** | IP address, port, inverter address, or device name |
 | **Configure** | Update interval, checksum verification, night values, or twilight threshold |
 
 Home Assistant tests a changed host, port, or inverter address before saving
@@ -123,7 +123,7 @@ gateway; the integration serializes and shares that connection between them
 automatically.
 
 To get combined totals across every inverter, select **Add integration**,
-choose **Solarmax Inverter** again, and pick **Add the inverter group**
+choose **Solarmax Inverter** again, and pick **Inverter group**
 instead of adding another device. This creates one virtual device with a sum
 entity for every register where adding values across inverters is meaningful
 (power, current, energy, installed power, start count -- for example, a

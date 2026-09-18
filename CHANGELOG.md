@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-18
+
+### Changed
+
+- Config flow wording cleanup:
+  - The setup menu's "Add an inverter" / "Add the inverter group" options
+    dropped the redundant "Add" (the dialog is already an add flow) and
+    the group option now says it sums the *selected* inverters, not
+    every configured one, matching the options step added in 0.7.0.
+  - The `Host` field is now labeled `IP address` (`IP-Adresse` /
+    `Adresse IP`), and no longer suggests `192.168.1.100` by default --
+    the field starts empty.
+  - The inverter group's setup step gained its own `Device name` field
+    (it previously had none, always using the fixed English "Inverter
+    Group"), and both it and the single-inverter setup step now suggest
+    a name in the active Home Assistant language ("Wechselrichter" /
+    "Wechselrichtergruppe" for German, "Onduleur" / "Groupe d'onduleurs"
+    for French, "Inverter" / "Inverter Group" otherwise) instead of a
+    fixed English default -- editable either way. Dropped the redundant
+    "Solarmax" prefix from both defaults, matching the earlier
+    integration-name simplification (the manufacturer already shows
+    separately in the device info).
+
 ## [0.8.0] - 2026-09-18
 
 ### Changed
@@ -395,7 +418,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.5...v0.7.0

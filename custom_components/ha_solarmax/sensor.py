@@ -27,6 +27,7 @@ from .const import (
     CONF_DEVICE_NAME,
     CONF_IS_GROUP,
     CONF_NIGHT_KEEP_VALUES,
+    DEFAULT_DEVICE_NAME,
     DEFAULT_GROUP_DEVICE_NAME,
     DEFAULT_NIGHT_KEEP_VALUES,
     DOMAIN,
@@ -74,7 +75,7 @@ async def async_setup_entry(
         return
 
     coordinator: SolarmaxCoordinator = entry.runtime_data
-    device_name = entry.data.get(CONF_DEVICE_NAME, "Solarmax Inverter")
+    device_name = entry.data.get(CONF_DEVICE_NAME, DEFAULT_DEVICE_NAME)
 
     async_add_entities(
         [

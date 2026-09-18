@@ -5,15 +5,15 @@
         "title": "Solarmax Wechselrichter",
         "description": "Wähle aus, was eingerichtet werden soll.",
         "menu_options": {
-          "device": "Wechselrichter hinzufügen",
-          "group": "Wechselrichter-Gruppe hinzufügen (summiert alle eingerichteten Wechselrichter)"
+          "device": "Wechselrichter",
+          "group": "Wechselrichter-Gruppe (summiert die ausgewählten Wechselrichter)"
         }
       },
       "device": {
         "title": "Solarmax Wechselrichter",
         "description": "Richten Sie Ihren Solarmax Wechselrichter ein",
         "data": {
-          "host": "Host",
+          "host": "IP-Adresse",
           "port": "Port",
           "address": "Wechselrichter-Adresse (1-249)",
           "update_interval": "Aktualisierungsintervall (Sekunden)",
@@ -28,13 +28,16 @@
       },
       "group": {
         "title": "Solarmax Wechselrichter-Gruppe",
-        "description": "Erstellt ein virtuelles Gerät mit einer Summen-Entität für jedes Register, das mindestens ein konfigurierter Wechselrichter liefert. Standardmäßig sind alle Wechselrichter enthalten; welche berücksichtigt werden, lässt sich später in den Optionen der Gruppe ändern."
+        "description": "Erstellt ein virtuelles Gerät mit einer Summen-Entität für jedes Register, bei dem eine Summe über mehrere Wechselrichter sinnvoll ist. Standardmäßig sind alle Wechselrichter enthalten; welche berücksichtigt werden, lässt sich später in den Optionen der Gruppe ändern.",
+        "data": {
+          "device_name": "Gerätename"
+        }
       },
       "reconfigure": {
         "title": "Wechselrichterverbindung ändern",
         "description": "Der Wechselrichter muss erreichbar sein, damit Verbindungsänderungen gespeichert werden können.",
         "data": {
-          "host": "Host",
+          "host": "IP-Adresse",
           "port": "Port",
           "address": "Wechselrichter-Adresse (1-249)",
           "device_name": "Gerätename"

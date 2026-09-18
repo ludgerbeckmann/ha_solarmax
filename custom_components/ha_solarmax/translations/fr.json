@@ -5,15 +5,15 @@
         "title": "Onduleur Solarmax",
         "description": "Choisissez ce que vous souhaitez configurer.",
         "menu_options": {
-          "device": "Ajouter un onduleur",
-          "group": "Ajouter le groupe d'onduleurs (somme de tous les onduleurs configurés)"
+          "device": "Onduleur",
+          "group": "Groupe d'onduleurs (additionne les onduleurs sélectionnés)"
         }
       },
       "device": {
         "title": "Onduleur Solarmax",
         "description": "Configurer votre onduleur Solarmax",
         "data": {
-          "host": "Hôte",
+          "host": "Adresse IP",
           "port": "Port",
           "address": "Adresse de l'onduleur (1-249)",
           "update_interval": "Intervalle de mise à jour (secondes)",
@@ -28,13 +28,16 @@
       },
       "group": {
         "title": "Groupe d'onduleurs Solarmax",
-        "description": "Crée un appareil virtuel avec une entité de somme pour chaque registre fourni par au moins un onduleur configuré. Tous les onduleurs sont inclus par défaut ; ceux pris en compte peuvent être modifiés ensuite dans les options du groupe."
+        "description": "Crée un appareil virtuel avec une entité de somme pour chaque registre pour lequel additionner les valeurs de plusieurs onduleurs a un sens. Tous les onduleurs sont inclus par défaut ; ceux pris en compte peuvent être modifiés ensuite dans les options du groupe.",
+        "data": {
+          "device_name": "Nom de l'appareil"
+        }
       },
       "reconfigure": {
         "title": "Modifier la connexion de l'onduleur",
         "description": "L'onduleur doit être accessible pour enregistrer les modifications de connexion.",
         "data": {
-          "host": "Hôte",
+          "host": "Adresse IP",
           "port": "Port",
           "address": "Adresse de l'onduleur (1-249)",
           "device_name": "Nom de l'appareil"

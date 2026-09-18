@@ -8,7 +8,7 @@ from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import async_get_integration
 
-from .const import CONF_HOST, CONF_IS_GROUP, DEVICE_KEY_SERIAL
+from .const import CONF_HOST, CONF_IS_GROUP, DEFAULT_DEVICE_NAME, DEVICE_KEY_SERIAL
 from .coordinator import (
     SolarmaxConfigEntry,
     SolarmaxCoordinator,
@@ -119,7 +119,7 @@ def _inverter_diagnostics(
     diagnostics_data["device_info"] = async_redact_data(
         {
             "identifiers": [(entry.domain, entry.entry_id)],
-            "name": entry.data.get("device_name", "Solarmax Inverter"),
+            "name": entry.data.get("device_name", DEFAULT_DEVICE_NAME),
             "manufacturer": "Solarmax",
             "model": coordinator.device_model or "Inverter",
         },

@@ -28,8 +28,8 @@ CONF_GROUP_MEMBERS = "group_members"
 DEFAULT_PORT = 12345
 DEFAULT_ADDRESS = 1
 DEFAULT_UPDATE_INTERVAL = 30
-DEFAULT_DEVICE_NAME = "Solarmax Inverter"
-DEFAULT_GROUP_DEVICE_NAME = "Solarmax Inverter Group"
+DEFAULT_DEVICE_NAME = "Inverter"
+DEFAULT_GROUP_DEVICE_NAME = "Inverter Group"
 # A single virtual entry summing every configured inverter; there is only
 # ever one, so it gets a fixed unique_id instead of one derived from a
 # connection endpoint.
