@@ -19,6 +19,7 @@ from .const import (
     DEFAULT_ADDRESS,
     DEFAULT_NIGHT_KEEP_VALUES,
     DOMAIN,
+    GROUP_EXCLUDED_KEYS,
 )
 from .coordinator import (
     SolarmaxConfigEntry,
@@ -141,10 +142,32 @@ async def async_setup_entry(hass: HomeAssistant, entry: SolarmaxConfigEntry) -> 
     return True
 
 
+def _remove_stale_group_entities(
+    hass: HomeAssistant, entry: SolarmaxConfigEntry
+) -> None:
+    """Remove group sum entities for registers no longer summed.
+
+    A key dropped from GROUP_SENSOR_TYPES (e.g. an intensive quantity like
+    voltage or relative power) stops being re-created on setup, but Home
+    Assistant does not remove entities on its own just because a platform
+    stopped adding them -- they would otherwise sit in the registry
+    forever, permanently unavailable.
+    """
+    registry = er.async_get(hass)
+    for entity_entry in er.async_entries_for_config_entry(registry, entry.entry_id):
+        suffix = entity_entry.unique_id.removeprefix(f"{entry.entry_id}-")
+        if suffix.upper() in GROUP_EXCLUDED_KEYS:
+            _LOGGER.info(
+                "Removing discontinued group entity %s", entity_entry.entity_id
+            )
+            registry.async_remove(entity_entry.entity_id)
+
+
 async def _async_setup_group_entry(
     hass: HomeAssistant, entry: SolarmaxConfigEntry
 ) -> bool:
     """Set up the virtual entry summing every other configured inverter."""
+    _remove_stale_group_entities(hass, entry)
     coordinator = SolarmaxGroupCoordinator(hass, entry)
 
     try:

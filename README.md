@@ -125,8 +125,13 @@ automatically.
 To get combined totals across every inverter, select **Add integration**,
 choose **Solarmax Inverter** again, and pick **Add the inverter group**
 instead of adding another device. This creates one virtual device with a sum
-entity for every register reported by at least one configured inverter (for
-example, a combined AC Power across all inverters). Only one group can exist.
+entity for every register where adding values across inverters is meaningful
+(power, current, energy, installed power, start count -- for example, a
+combined AC Power across all inverters). Voltages, frequencies, temperatures,
+and relative power are left out: they describe the grid or a single device
+rather than something that scales with fleet size, so summing them would
+produce a meaningless multiple rather than a real total. Only one group can
+exist.
 By default every configured inverter counts, and one added or removed later
 is picked up automatically without reconfiguring the group; use the group's
 own **Configure** (gear icon) to limit the sum to a specific selection of

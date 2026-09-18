@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-18
+
+### Changed
+
+- The inverter group no longer sums voltages, frequencies, temperatures, or
+  relative power (`UDC`/`UL1`-`UL3`/`UD01`-`UD03`, `ULH`/`ULL`, `TNF`,
+  `TNH`/`TNL`, `TKK`/`TK2`/`TK3`, `PRL`), and also drops operating hours
+  (`KHR`). These are intensive quantities -- the same regardless of how
+  many inverters are in the group -- so summing them across inverters
+  produced a meaningless multiple rather than a real total (e.g. three
+  inverters on the same grid summing to a nonsensical "690V"). The group
+  now only sums registers where a total genuinely means something: power,
+  current, energy, installed power, and start count. Existing group sum
+  entities for the dropped registers are removed from the entity registry
+  on the next setup instead of lingering as permanently-unavailable ghosts.
+
 ## [0.7.1] - 2026-09-17
 
 ### Fixed
@@ -379,7 +395,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.5...v0.7.0
 [0.6.5]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.6.4...v0.6.5

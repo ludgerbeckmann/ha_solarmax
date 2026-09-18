@@ -765,11 +765,39 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
 )
 
 # Registers the inverter group can sum. SYS and SAL are enum/bitmask codes,
-# not numbers, so there is nothing to add them into.
+# not numbers, so there is nothing to add them into. Voltages, frequencies,
+# temperatures, and relative power are intensive quantities -- the same
+# regardless of fleet size -- so summing them across inverters produces a
+# meaningless multiple rather than a real total; only extensive quantities
+# that legitimately add up (power, current, energy, installed power,
+# startup count) belong in the group.
+GROUP_EXCLUDED_KEYS = frozenset(
+    {
+        SENSOR_TYPE_STATUS,
+        SENSOR_TYPE_ALARM,
+        "UDC",
+        "UL1",
+        "UL2",
+        "UL3",
+        "UD01",
+        "UD02",
+        "UD03",
+        "ULH",
+        "ULL",
+        "TNF",
+        "TNH",
+        "TNL",
+        "TKK",
+        "TK2",
+        "TK3",
+        "PRL",
+        "KHR",
+    }
+)
 GROUP_SENSOR_TYPES: tuple[SensorEntityDescription, ...] = tuple(
     description
     for description in SENSOR_TYPES
-    if description.key not in (SENSOR_TYPE_STATUS, SENSOR_TYPE_ALARM)
+    if description.key not in GROUP_EXCLUDED_KEYS
 )
 
 
