@@ -628,7 +628,7 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         icon="mdi:solar-power",
     ),
-    # --- Temperatures (diagnostic, opt-in) ---
+    # --- Temperature (enabled by default; secondary sensors below stay opt-in) ---
     SensorEntityDescription(
         key="TKK",
         translation_key="tkk",
@@ -637,7 +637,6 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:thermometer",
         entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="TK2",
@@ -691,7 +690,7 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         icon="mdi:information",
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
-    # --- Grid monitoring (diagnostic, opt-in) ---
+    # --- Grid frequency (enabled by default; limits below stay opt-in) ---
     SensorEntityDescription(
         key="TNF",
         translation_key="tnf",
@@ -700,9 +699,9 @@ SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:sine-wave",
         entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
         suggested_display_precision=2,
     ),
+    # --- Grid monitoring limits (diagnostic, opt-in) ---
     SensorEntityDescription(
         key="ULH",
         translation_key="ulh",

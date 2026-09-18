@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-09-18
+
+### Changed
+
+- Enabled by default for newly created entities: Grid frequency (`TNF`)
+  and Inverter temperature (`TKK`) — previously opt-in. Both are single,
+  broadly useful values (grid stability, overheating) unlike their
+  per-phase/per-string/secondary siblings (`TNH`/`TNL`, `TK2`/`TK3`,
+  etc.), which stay opt-in diagnostics. Only affects entities Home
+  Assistant has not created yet; existing disabled entities keep their
+  current state.
+
 ## [0.9.0] - 2026-09-18
 
 ### Changed
@@ -418,7 +430,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.0...v0.7.1

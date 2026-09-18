@@ -317,6 +317,8 @@ in parentheses to make protocol logs and diagnostics easier to interpret.
 | Operating hours | `KHR` | h |
 | Start count | `CAC` | count |
 | Installed power | `PIN` | W |
+| Inverter temperature | `TKK` | °C |
+| Grid frequency | `TNF` | Hz |
 | Alarm | `SAL` | Translated alarm state and active alarm details |
 | Status Code | `SYS` | Translated inverter or connection state |
 | Last Connection Fault | — (synthetic) | Timestamp; see [Last Connection Fault](#last-connection-fault) |
@@ -330,8 +332,7 @@ in parentheses to make protocol logs and diagnostics easier to interpret.
 | DC and string voltage | `UDC`, `UD01`–`UD03` | V |
 | AC phase current | `IL1`–`IL3` | A |
 | DC and string current | `IDC`, `ID01`–`ID03` | A |
-| Temperature | `TKK`, `TK2`, `TK3` | °C |
-| Grid frequency | `TNF` | Hz |
+| Additional inverter temperature | `TK2`, `TK3` | °C |
 | Grid voltage limits | `ULH`, `ULL` | V |
 | Grid frequency limits | `TNH`, `TNL` | Hz |
 
