@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Solarmax Inverter Emulator.
+"""SolarMax Inverter Emulator.
 
-A TCP server that emulates a Solarmax inverter for testing the HA integration
+A TCP server that emulates a SolarMax inverter for testing the HA integration
 when the real inverter is offline.
 
 Usage:
@@ -361,7 +361,7 @@ def get_scenario_state(scenario: str) -> InverterState:
 
 
 class SolarmaxEmulator:
-    """TCP server emulating a Solarmax inverter."""
+    """TCP server emulating a SolarMax inverter."""
 
     def __init__(self, host: str = "0.0.0.0", port: int = 12345, address: int = 1):
         """Initialize the emulator."""
@@ -398,7 +398,7 @@ class SolarmaxEmulator:
         self._idle_timeout = value
 
     def calculate_checksum(self, data: str) -> str:
-        """Calculate the Solarmax protocol checksum."""
+        """Calculate the SolarMax protocol checksum."""
         checksum_value = sum(ord(c) for c in data)
         return format(checksum_value, "04X")
 
@@ -597,7 +597,7 @@ class SolarmaxEmulator:
         self.running = True
 
         _LOGGER.info("=" * 60)
-        _LOGGER.info("  Solarmax Inverter Emulator")
+        _LOGGER.info("  SolarMax Inverter Emulator")
         _LOGGER.info("=" * 60)
         _LOGGER.info(f"  Listening on {self.host}:{self.port}")
         _LOGGER.info(f"  Inverter address: {self.address}")
@@ -809,7 +809,7 @@ def interactive_loop(emulator: SolarmaxEmulator) -> None:
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Solarmax Inverter Emulator for testing the HA integration"
+        description="SolarMax Inverter Emulator for testing the HA integration"
     )
     parser.add_argument(
         "--port", type=int, default=12345, help="TCP port to listen on (default: 12345)"

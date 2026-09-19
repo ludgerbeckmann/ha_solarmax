@@ -1,4 +1,4 @@
-"""Diagnostics support for Solarmax integration."""
+"""Diagnostics support for SolarMax integration."""
 
 from __future__ import annotations
 
@@ -120,7 +120,7 @@ def _inverter_diagnostics(
         {
             "identifiers": [(entry.domain, entry.entry_id)],
             "name": entry.data.get("device_name", DEFAULT_DEVICE_NAME),
-            "manufacturer": "Solarmax",
+            "manufacturer": "SolarMax",
             "model": coordinator.device_model or "Inverter",
         },
         REDACT_KEYS,

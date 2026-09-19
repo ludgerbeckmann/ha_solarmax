@@ -1,4 +1,4 @@
-"""Config entry storage helpers for Solarmax."""
+"""Config entry storage helpers for SolarMax."""
 
 from __future__ import annotations
 
@@ -105,7 +105,7 @@ async def _reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     try:
         return await hass.config_entries.async_reload(entry.entry_id)
     except Exception:
-        _LOGGER.exception("Failed to reload Solarmax entry %s", entry.entry_id)
+        _LOGGER.exception("Failed to reload SolarMax entry %s", entry.entry_id)
         return False
 
 
@@ -175,7 +175,7 @@ async def async_apply_and_reload(
         _apply_reload_or_rollback(
             hass, entry, data=data, options=options, title=title, unique_id=unique_id
         ),
-        f"update Solarmax entry {entry.entry_id}",
+        f"update SolarMax entry {entry.entry_id}",
     )
     await _await_atomic(transaction)
 

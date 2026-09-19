@@ -1,6 +1,6 @@
 # Architecture
 
-Solarmax Inverter separates protocol parsing, socket ownership, connection policy, Home Assistant scheduling, and entity presentation. Keep those boundaries when adding behavior.
+SolarMax separates protocol parsing, socket ownership, connection policy, Home Assistant scheduling, and entity presentation. Keep those boundaries when adding behavior.
 
 ```mermaid
 flowchart LR

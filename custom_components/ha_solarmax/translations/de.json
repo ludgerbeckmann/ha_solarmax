@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Solarmax Wechselrichter",
+        "title": "SolarMax",
         "description": "Wähle aus, was eingerichtet werden soll.",
         "menu_options": {
           "device": "Wechselrichter",
@@ -10,8 +10,8 @@
         }
       },
       "device": {
-        "title": "Solarmax Wechselrichter",
-        "description": "Richten Sie Ihren Solarmax Wechselrichter ein",
+        "title": "SolarMax",
+        "description": "Richten Sie Ihren SolarMax Wechselrichter ein",
         "data": {
           "host": "IP-Adresse",
           "port": "Port",
@@ -27,7 +27,7 @@
         }
       },
       "group": {
-        "title": "Solarmax Wechselrichter-Gruppe",
+        "title": "SolarMax-Gruppe",
         "description": "Erstellt ein virtuelles Gerät mit einer Summen-Entität für jedes Register, bei dem eine Summe über mehrere Wechselrichter sinnvoll ist. Standardmäßig sind alle Wechselrichter enthalten; welche berücksichtigt werden, lässt sich später in den Optionen der Gruppe ändern.",
         "data": {
           "device_name": "Gerätename"
@@ -67,7 +67,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Solarmax Wechselrichter Optionen",
+        "title": "SolarMax-Optionen",
         "description": "Ändern Sie die Abfrage- und Sensoreinstellungen.",
         "data": {
           "update_interval": "Aktualisierungsintervall (Sekunden)",
@@ -80,7 +80,7 @@
         }
       },
       "group_members": {
-        "title": "Solarmax Wechselrichter-Gruppe",
+        "title": "SolarMax-Gruppe",
         "description": "Wähle aus, welche konfigurierten Wechselrichter in dieser Gruppe summiert werden. Standardmäßig sind alle enthalten.",
         "data": {
           "group_members": "Zu berücksichtigende Wechselrichter"

@@ -1,4 +1,4 @@
-"""Sensor platform for Solarmax integration."""
+"""Sensor platform for SolarMax integration."""
 
 from __future__ import annotations
 
@@ -69,7 +69,7 @@ async def async_setup_entry(
     entry: SolarmaxConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Solarmax sensor platform."""
+    """Set up SolarMax sensor platform."""
     if entry.data.get(CONF_IS_GROUP, False):
         _async_setup_group_entry(entry, async_add_entities)
         return
@@ -142,7 +142,7 @@ def _make_device_registry_updater(
 
 
 class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], RestoreSensor):
-    """Representation of a Solarmax sensor."""
+    """Representation of a SolarMax sensor."""
 
     _attr_has_entity_name = True
 
@@ -190,7 +190,7 @@ class SolarmaxSensor(CoordinatorEntity[SolarmaxCoordinator], RestoreSensor):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name=device_name,
-            manufacturer="Solarmax",
+            manufacturer="SolarMax",
             model=coordinator.device_model or "Inverter",
             sw_version=coordinator.sw_version,
             serial_number=coordinator.serial_number,
@@ -466,7 +466,7 @@ class SolarmaxLastFaultSensor(CoordinatorEntity[SolarmaxCoordinator], RestoreSen
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name=device_name,
-            manufacturer="Solarmax",
+            manufacturer="SolarMax",
             model=coordinator.device_model or "Inverter",
             sw_version=coordinator.sw_version,
             serial_number=coordinator.serial_number,
@@ -524,7 +524,7 @@ class SolarmaxGroupSensor(CoordinatorEntity[SolarmaxGroupCoordinator], SensorEnt
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name=device_name,
-            manufacturer="Solarmax",
+            manufacturer="SolarMax",
             model="Inverter Group",
         )
 

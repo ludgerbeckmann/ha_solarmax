@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-09-19
+
+### Changed
+
+- Renamed the integration's display name from "Solarmax Inverter" to
+  "SolarMax" in `manifest.json` and `hacs.json`, matching how comparable
+  official integrations name themselves after just the manufacturer (e.g.
+  "SolarEdge"). Corrected the "Solarmax" → "SolarMax" capitalization
+  inconsistency throughout config flow titles/descriptions (all
+  languages), the `manufacturer` field on every device, docstrings, and
+  documentation. The `ha_solarmax` domain, entity unique IDs, and Python
+  identifiers are unaffected — no reconfiguration needed for existing
+  installations.
+
 ## [0.10.0] - 2026-09-19
 
 ### Added
@@ -470,7 +484,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.3...v0.10.0
 [0.9.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.1...v0.9.2

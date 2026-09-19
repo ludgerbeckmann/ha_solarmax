@@ -56,6 +56,18 @@ sorgfältig, keine funktionalen Bugs gefunden.
 - **Release-Prozess**: Bewusst simpel gehalten, exakt nach dem Vorbild von
   `ha_smart_ventilation` (nicht das ursprünglich komplexere Draft/PR-Modell
   aus einer früheren Zwischenversion). Siehe unten.
+- **Anzeigename "SolarMax" statt "Solarmax Inverter"** (Version 0.10.1):
+  Vergleichbare offizielle Integrationen nennen nur den Herstellernamen
+  (z. B. "SolarEdge"); "Inverter"/"Integration" ergibt sich in Home
+  Assistant ohnehin aus dem Kontext. Keine offizielle Home-Assistant-Core-
+  Integration namens `solarmax` existiert, mit der das kollidieren könnte;
+  der ursprüngliche Fork (`oschick/solarmax-ha-integration`) nutzt eine
+  andere Domain und den längeren Namen "Solarmax Inverter" weiter. Domain
+  (`ha_solarmax`) und Python-Bezeichner (Klassen wie `SolarmaxLink`,
+  `SolarmaxCoordinator`) bleiben unverändert — nur Anzeigetexte
+  (manifest.json/hacs.json `name`, strings.json/translations, Docstrings,
+  Kommentare, `manufacturer`-Feld) wurden auf die korrekte Schreibweise
+  "SolarMax" (großes M) vereinheitlicht.
 
 ## Release-Prozess
 
@@ -91,8 +103,11 @@ Tests.
 - **Zip-Dateiname**: `ha_solarmax_<version>.zip` (Unterstrich, kein
   Bindestrich).
 - Namensinkonsistenzen zwischen `manifest.json` und `hacs.json` vermeiden —
-  beide sollen "Solarmax Inverter" heißen (ohne den Zusatz "Integration" —
-  das ergibt sich in Home Assistant von selbst aus dem Kontext).
+  beide sollen schlicht "SolarMax" heißen (Herstellername genügt, kein
+  Zusatz "Inverter"/"Integration" — das ergibt sich in Home Assistant von
+  selbst aus dem Kontext). Seit v0.10.1 umgesetzt: Anzeigename von
+  "Solarmax Inverter" auf "SolarMax" verkürzt, Schreibweise überall auf
+  "SolarMax" (großes M) vereinheitlicht.
 
 ## Offener Punkt bei Chat-Ende
 

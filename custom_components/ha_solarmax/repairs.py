@@ -1,4 +1,4 @@
-"""Verified connection repair for Solarmax integration."""
+"""Verified connection repair for SolarMax integration."""
 
 from __future__ import annotations
 
@@ -176,7 +176,7 @@ class SolarmaxConnectionRepairFlow(RepairsFlow):
             if unchanged and runtime is not None:
                 self.hass.async_create_task(
                     runtime.async_request_refresh(),
-                    f"verify Solarmax repair {entry.entry_id}",
+                    f"verify SolarMax repair {entry.entry_id}",
                 )
             elif not unchanged or entry.disabled_by is None:
                 await async_apply_and_reload(

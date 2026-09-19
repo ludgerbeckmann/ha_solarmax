@@ -1,4 +1,4 @@
-"""Constants for the Solarmax Inverter integration."""
+"""Constants for the SolarMax integration."""
 
 from enum import StrEnum
 

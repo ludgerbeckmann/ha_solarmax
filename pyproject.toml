@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "solarmax-ha-integration"
-version = "0.10.0"
-description = "Home Assistant integration for Solarmax solar inverters"
+version = "0.10.1"
+description = "Home Assistant integration for SolarMax solar inverters"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [

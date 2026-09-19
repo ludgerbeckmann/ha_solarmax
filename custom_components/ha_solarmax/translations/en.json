@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Solarmax Inverter",
+        "title": "SolarMax",
         "description": "Choose what to set up.",
         "menu_options": {
           "device": "Inverter",
@@ -10,8 +10,8 @@
         }
       },
       "device": {
-        "title": "Solarmax Inverter",
-        "description": "Set up your Solarmax inverter",
+        "title": "SolarMax",
+        "description": "Set up your SolarMax inverter",
         "data": {
           "host": "IP address",
           "port": "Port",
@@ -27,7 +27,7 @@
         }
       },
       "group": {
-        "title": "Solarmax Inverter Group",
+        "title": "SolarMax Group",
         "description": "Creates one virtual device with a sum entity for every register where adding values across inverters is meaningful. By default every inverter is included; which ones count can be changed later in the group's options.",
         "data": {
           "device_name": "Device name"
@@ -67,7 +67,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Solarmax Inverter Options",
+        "title": "SolarMax Options",
         "description": "Change polling and sensor preferences.",
         "data": {
           "update_interval": "Update interval (seconds)",
@@ -80,7 +80,7 @@
         }
       },
       "group_members": {
-        "title": "Solarmax Inverter Group",
+        "title": "SolarMax Group",
         "description": "Choose which configured inverters are summed into this group. All of them are included by default.",
         "data": {
           "group_members": "Inverters to include"

@@ -1,11 +1,11 @@
-# Solarmax Inverter for Home Assistant
+# SolarMax for Home Assistant
 
 [![Validate](https://github.com/ludgerbeckmann/ha_solarmax/actions/workflows/validate.yml/badge.svg)](https://github.com/ludgerbeckmann/ha_solarmax/actions/workflows/validate.yml)
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 [![GitHub release](https://img.shields.io/github/release/ludgerbeckmann/ha_solarmax.svg)](https://github.com/ludgerbeckmann/ha_solarmax/releases/)
 [![GitHub license](https://img.shields.io/github/license/ludgerbeckmann/ha_solarmax.svg)](https://github.com/ludgerbeckmann/ha_solarmax/blob/main/LICENSE)
 
-Solarmax Inverter connects Home Assistant directly to a SolarMax inverter over
+SolarMax connects Home Assistant directly to a SolarMax inverter over
 the MaxComm TCP protocol on your local network. It reads production, energy
 totals, operating status, alarms, and diagnostic measurements without a cloud
 account.
@@ -57,7 +57,7 @@ change after setup.
 2. Open the menu and select **Custom repositories**.
 3. Add `https://github.com/ludgerbeckmann/ha_solarmax` as an
    **Integration** repository.
-4. Search for **Solarmax Inverter** and install it.
+4. Search for **SolarMax** and install it.
 5. Restart Home Assistant.
 
 HACS handles updates after the custom repository has been added.
@@ -77,7 +77,7 @@ After installation:
 
 1. Open **Settings → Devices & services**.
 2. Select **Add integration**.
-3. Search for **Solarmax Inverter**.
+3. Search for **SolarMax**.
 4. Enter the inverter details and polling settings.
 
 Home Assistant briefly connects to the inverter before saving the entry. After
@@ -123,7 +123,7 @@ gateway; the integration serializes and shares that connection between them
 automatically.
 
 To get combined totals across every inverter, select **Add integration**,
-choose **Solarmax Inverter** again, and pick **Inverter group**
+choose **SolarMax** again, and pick **Inverter group**
 instead of adding another device. This creates one virtual device with a sum
 entity for every register where adding values across inverters is meaningful
 (power, current, energy, installed power, start count -- for example, a
@@ -268,7 +268,7 @@ next successful poll.
 New inverters are set up with this enabled by default. To change it:
 
 1. Open **Settings → Devices & services**.
-2. Find **Solarmax Inverter** and select **Configure**.
+2. Find **SolarMax** and select **Configure**.
 3. Toggle **Keep sensor values overnight** and save.
 
 With this option disabled, measurement entities become unavailable while the

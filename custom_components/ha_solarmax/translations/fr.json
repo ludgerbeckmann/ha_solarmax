@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Onduleur Solarmax",
+        "title": "SolarMax",
         "description": "Choisissez ce que vous souhaitez configurer.",
         "menu_options": {
           "device": "Onduleur",
@@ -10,8 +10,8 @@
         }
       },
       "device": {
-        "title": "Onduleur Solarmax",
-        "description": "Configurer votre onduleur Solarmax",
+        "title": "SolarMax",
+        "description": "Configurer votre onduleur SolarMax",
         "data": {
           "host": "Adresse IP",
           "port": "Port",
@@ -27,7 +27,7 @@
         }
       },
       "group": {
-        "title": "Groupe d'onduleurs Solarmax",
+        "title": "Groupe SolarMax",
         "description": "Crée un appareil virtuel avec une entité de somme pour chaque registre pour lequel additionner les valeurs de plusieurs onduleurs a un sens. Tous les onduleurs sont inclus par défaut ; ceux pris en compte peuvent être modifiés ensuite dans les options du groupe.",
         "data": {
           "device_name": "Nom de l'appareil"
@@ -67,7 +67,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Options de l'onduleur Solarmax",
+        "title": "Options SolarMax",
         "description": "Modifiez les préférences d'interrogation et des capteurs.",
         "data": {
           "update_interval": "Intervalle de mise à jour (secondes)",
@@ -80,7 +80,7 @@
         }
       },
       "group_members": {
-        "title": "Groupe d'onduleurs Solarmax",
+        "title": "Groupe SolarMax",
         "description": "Choisissez quels onduleurs configurés sont additionnés dans ce groupe. Tous sont inclus par défaut.",
         "data": {
           "group_members": "Onduleurs à inclure"

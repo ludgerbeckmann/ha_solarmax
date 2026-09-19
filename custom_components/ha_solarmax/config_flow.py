@@ -1,4 +1,4 @@
-"""Config flow for Solarmax Inverter integration."""
+"""Config flow for SolarMax integration."""
 
 from __future__ import annotations
 
@@ -148,7 +148,7 @@ def _build_options_schema(values: Mapping[str, Any]) -> vol.Schema:
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Solarmax Inverter."""
+    """Handle a config flow for SolarMax."""
 
     VERSION = 2
     MINOR_VERSION = 1
@@ -324,7 +324,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class OptionsFlow(config_entries.OptionsFlow):
-    """Handle options flow for Solarmax Inverter."""
+    """Handle options flow for SolarMax."""
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None

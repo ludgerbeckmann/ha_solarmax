@@ -1,4 +1,4 @@
-"""DataUpdateCoordinator for Solarmax."""
+"""DataUpdateCoordinator for SolarMax."""
 
 from __future__ import annotations
 
@@ -65,7 +65,7 @@ _CLOCK_NIGHT_HOUR = 20
 
 
 class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
-    """Poll a Solarmax inverter through a ConnectionEngine.
+    """Poll a SolarMax inverter through a ConnectionEngine.
 
     Every poll cycle produces an EngineSnapshot, never an exception — this
     is what makes the coordinator a thin *always-succeed* adapter. HA's
@@ -458,7 +458,7 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
 
 
 class SolarmaxGroupCoordinator(DataUpdateCoordinator[dict[str, float]]):
-    """Sums each summable register across every other loaded Solarmax entry.
+    """Sums each summable register across every other loaded SolarMax entry.
 
     Not tied to any inverter connection: `data` is a plain {register: sum}
     dict, recomputed from the entity registry and current entity states

@@ -1,4 +1,4 @@
-"""The Solarmax Inverter integration."""
+"""The SolarMax integration."""
 
 from __future__ import annotations
 
@@ -92,7 +92,7 @@ def _migrate_unique_ids(hass: HomeAssistant, entry: SolarmaxConfigEntry) -> None
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: SolarmaxConfigEntry) -> bool:
-    """Set up Solarmax Inverter from a config entry."""
+    """Set up SolarMax from a config entry."""
     if entry.data.get(CONF_IS_GROUP, False):
         return await _async_setup_group_entry(hass, entry)
 
@@ -111,7 +111,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: SolarmaxConfigEntry) -> 
 
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
         if not coordinator.sensor_setup_complete:
-            raise RuntimeError("Solarmax sensor platform setup failed")
+            raise RuntimeError("SolarMax sensor platform setup failed")
 
         # Register only after platform setup succeeds so failed setup cannot
         # leave callbacks targeting a closed coordinator.
@@ -123,7 +123,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: SolarmaxConfigEntry) -> 
             )
 
         _LOGGER.info(
-            "Successfully set up Solarmax inverter at %s:%s",
+            "Successfully set up SolarMax inverter at %s:%s",
             entry.data[CONF_HOST],
             entry.data[CONF_PORT],
         )
@@ -175,8 +175,8 @@ async def _async_setup_group_entry(
         entry.runtime_data = coordinator
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
         if not coordinator.sensor_setup_complete:
-            raise RuntimeError("Solarmax group sensor platform setup failed")
-        _LOGGER.info("Successfully set up the Solarmax inverter group")
+            raise RuntimeError("SolarMax group sensor platform setup failed")
+        _LOGGER.info("Successfully set up the SolarMax inverter group")
     except BaseException:
         try:
             await coordinator.async_shutdown()

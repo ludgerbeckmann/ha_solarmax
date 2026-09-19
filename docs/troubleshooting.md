@@ -13,7 +13,7 @@ Check the Status Code entity first. It stays available when the inverter does no
 
 SolarMax inverters accept one TCP client. Close the vendor application, test scripts, and other Home Assistant instances before retrying. A crashed client can leave the inverter unavailable for about two minutes.
 
-Confirm these settings from **Settings → Devices & services → Solarmax Inverter → Configure**:
+Confirm these settings from **Settings → Devices & services → SolarMax → Configure**:
 
 - Host matches the inverter's current address.
 - Port matches the MaxComm service, usually `12345`.
@@ -53,7 +53,7 @@ logger:
     custom_components.ha_solarmax: debug
 ```
 
-Restart Home Assistant or reload logging, reproduce the issue, then download diagnostics from the Solarmax integration page.
+Restart Home Assistant or reload logging, reproduce the issue, then download diagnostics from the SolarMax integration page.
 
 At debug level, connection attempts, timeouts, retries, and reconnects are logged with the host, port, and (where relevant) inverter address, so a multi-inverter setup can still be filtered down to one endpoint even though the log itself covers the whole integration, not a single device.
 
