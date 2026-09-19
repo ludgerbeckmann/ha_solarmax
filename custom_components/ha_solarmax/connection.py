@@ -186,11 +186,23 @@ class SolarmaxLink:
                     f"{self.host}:{self.port}: closed during poll"
                 ) from err
             self.reconnects += 1
+            _LOGGER.debug(
+                "%s:%s: peer closed the connection, reconnecting (reconnect #%d)",
+                self.host,
+                self.port,
+                self.reconnects,
+            )
             await self._connect()
             try:
                 return await self._send_receive(payload)
             except _PeerClosed as err2:
                 await self._close_transport()
+                _LOGGER.debug(
+                    "%s:%s: peer closed the connection again immediately after "
+                    "reconnecting",
+                    self.host,
+                    self.port,
+                )
                 raise LinkClosed(
                     f"peer at {self.host}:{self.port} closed the connection"
                 ) from err2
@@ -249,9 +261,23 @@ class SolarmaxLink:
         except TimeoutError as err:
             self.timeouts += 1
             self._abort_transport()
+            _LOGGER.debug(
+                "%s:%s: connect timed out after %.1fs (attempt #%d)",
+                self.host,
+                self.port,
+                self.connect_timeout,
+                self.attempts,
+            )
             raise LinkTimeout(f"connect to {self.host}:{self.port} timed out") from err
         except OSError as err:
             self._abort_transport()
+            _LOGGER.debug(
+                "%s:%s: connect failed (attempt #%d): %s",
+                self.host,
+                self.port,
+                self.attempts,
+                err,
+            )
             raise LinkClosed(
                 f"connect to {self.host}:{self.port} failed: {err}"
             ) from err
@@ -271,14 +297,23 @@ class SolarmaxLink:
         except TimeoutError as err:
             self.timeouts += 1
             self._abort_transport()
+            _LOGGER.debug(
+                "%s:%s: no response within %.1fs (timeout #%d)",
+                self.host,
+                self.port,
+                self.response_timeout,
+                self.timeouts,
+            )
             raise LinkTimeout(
                 f"no response from {self.host}:{self.port} "
                 f"within {self.response_timeout}s"
             ) from err
         except (ConnectionResetError, BrokenPipeError) as err:
+            _LOGGER.debug("%s:%s: connection reset: %s", self.host, self.port, err)
             raise _PeerClosed(str(err)) from err
         except OSError as err:
             await self._close_transport()
+            _LOGGER.debug("%s:%s: socket error: %s", self.host, self.port, err)
             raise LinkClosed(f"{self.host}:{self.port}: {err}") from err
         except asyncio.CancelledError:
             # External cancellation (e.g. an outer asyncio.timeout wrapping a
@@ -398,7 +433,15 @@ class ConnectionEngine:
             try:
                 async with asyncio.timeout(POLL_BUDGET_SECONDS):
                     return await self._poll_inner()
-            except (TimeoutError, LinkTimeout, LinkClosed, ProtocolError):
+            except (TimeoutError, LinkTimeout, LinkClosed, ProtocolError) as err:
+                _LOGGER.debug(
+                    "%s:%s address %d: poll failed (%s): %s",
+                    self._link.host,
+                    self._link.port,
+                    self._address,
+                    type(err).__name__,
+                    err,
+                )
                 return await self._on_failure()
 
     @asynccontextmanager
@@ -459,10 +502,22 @@ class ConnectionEngine:
         try:
             raw = await self._link.request(payload)
         except LinkTimeout:
+            _LOGGER.debug(
+                "%s:%s address %d: retrying once after a timeout",
+                self._link.host,
+                self._link.port,
+                self._address,
+            )
             raw = await self._link.request(payload)
         try:
             return parse_response(raw, self._verify_checksum)
         except RetryableProtocolError:
+            _LOGGER.debug(
+                "%s:%s address %d: retrying once after a corrupt/invalid response",
+                self._link.host,
+                self._link.port,
+                self._address,
+            )
             raw = await self._link.request(payload)
             return parse_response(raw, self._verify_checksum)
 

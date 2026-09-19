@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-09-19
+
+### Added
+
+- Debug-level logging throughout the connection retry path (`connect`
+  timeouts/failures, response timeouts, peer-closed reconnects, and the
+  engine's own retry-once attempts), each tagged with host, port, and
+  (where relevant) inverter address. Previously a sustained daytime fault
+  left almost no trace in the log beyond the single "unreachable (fault)"
+  warning at the moment it started, making it impossible to tell after
+  the fact whether repeated automatic reconnect attempts were timing out,
+  getting refused, or something else -- particularly unhelpful for a
+  fault that a Home Assistant restart clears but the integration's own
+  retries do not, since that points at state stuck in the running
+  process rather than the network.
+
+### Fixed
+
+- Corrected stale troubleshooting docs claiming HOLD/ZERO-policy sensors
+  stay unavailable after a restart at night; 0.5.4/0.6.3/0.6.4 fixed
+  that.
+
 ## [0.9.3] - 2026-09-19
 
 ### Fixed
@@ -448,7 +470,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.3...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.3...v0.10.0
 [0.9.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.0...v0.9.1

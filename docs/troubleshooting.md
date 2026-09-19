@@ -41,7 +41,7 @@ An inverter may omit MaxComm fields it does not support. Those entities remain u
 
 During `offline_fault`, data sensors become unavailable from the first failed poll. During `offline_expected`, **Keep sensor values overnight** can zero production readings, hold cumulative values, and reset daily energy at local midnight. Grid voltage, grid frequency, and temperatures remain unavailable because the integration cannot infer honest values.
 
-After a restart at night, held sensors remain unavailable until one successful daytime poll provides a value.
+After a restart at night, HOLD- and ZERO-policy sensors (energy totals, operating hours, start count, AC/DC power, currents) restore their last known value or the honest synthetic zero, same as before the restart. Grid voltage, grid frequency, and temperatures have no night policy and stay unavailable regardless, as noted above.
 
 ## Logs and diagnostics
 
@@ -54,6 +54,8 @@ logger:
 ```
 
 Restart Home Assistant or reload logging, reproduce the issue, then download diagnostics from the Solarmax integration page.
+
+At debug level, connection attempts, timeouts, retries, and reconnects are logged with the host, port, and (where relevant) inverter address, so a multi-inverter setup can still be filtered down to one endpoint even though the log itself covers the whole integration, not a single device.
 
 Diagnostics redact the configured host and inverter serial number. Review the file and log excerpt before publishing them because surrounding Home Assistant data may contain network names or other private details.
 
