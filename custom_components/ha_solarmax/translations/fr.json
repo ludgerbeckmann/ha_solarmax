@@ -98,9 +98,9 @@
         "step": {
           "confirm": {
             "title": "Réparer la connexion de l'onduleur",
-            "description": "L'onduleur à {host}:{port} est inaccessible depuis {minutes} minutes en journée. Modifiez l'hôte ou le port pour tester une autre connexion.",
+            "description": "L'onduleur à {host}:{port} est inaccessible depuis {minutes} minutes en journée. Modifiez l'adresse IP ou le port pour tester une autre connexion.",
             "data": {
-              "host": "Hôte",
+              "host": "Adresse IP",
               "port": "Port"
             }
           }

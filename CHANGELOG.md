@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.3] - 2026-09-19
+
+### Fixed
+
+- The "Host" → "IP address" field rename in 0.9.0 missed the Repairs
+  flow's own copy of that label ("Repair inverter connection" dialog),
+  which kept showing "Host" in all three languages.
+
 ## [0.9.2] - 2026-09-19
 
 ### Fixed
@@ -440,7 +448,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.2...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.3...HEAD
+[0.9.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.8.0...v0.9.0

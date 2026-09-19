@@ -98,9 +98,9 @@
         "step": {
           "confirm": {
             "title": "Repair inverter connection",
-            "description": "The inverter at {host}:{port} has been unreachable for {minutes} minutes during daytime. Update the host or port to test another connection.",
+            "description": "The inverter at {host}:{port} has been unreachable for {minutes} minutes during daytime. Update the IP address or port to test another connection.",
             "data": {
-              "host": "Host",
+              "host": "IP address",
               "port": "Port"
             }
           }
