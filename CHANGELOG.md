@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-09-19
+
+### Fixed
+
+- Fixed `TypeError: find_endpoint_conflict() missing 1 required positional
+  argument: 'address'` when submitting the "Repair inverter connection"
+  dialog from Repairs. Both call sites in `repairs.py` were missing the
+  inverter's address, a pre-existing bug that only surfaced once the
+  repair flow was actually exercised.
+
 ## [0.9.1] - 2026-09-18
 
 ### Changed
@@ -430,7 +440,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.2...HEAD
+[0.9.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.7.1...v0.8.0

@@ -134,9 +134,10 @@ class SolarmaxConnectionRepairFlow(RepairsFlow):
     ) -> data_entry_flow.FlowResult:
         """Serialize probing and activation with all other configuration flows."""
         host, port = values[CONF_HOST], values[CONF_PORT]
-        target_endpoint = endpoint_unique_id(host, port, entry.data[CONF_ADDRESS])
+        address = entry.data[CONF_ADDRESS]
+        target_endpoint = endpoint_unique_id(host, port, address)
         if find_endpoint_conflict(
-            self.hass, host, port, exclude_entry_id=entry.entry_id
+            self.hass, host, port, address, exclude_entry_id=entry.entry_id
         ):
             return self.async_abort(reason="already_configured")
         registry = ir.async_get(self.hass)
@@ -153,7 +154,7 @@ class SolarmaxConnectionRepairFlow(RepairsFlow):
                     self.hass,
                     host=host,
                     port=port,
-                    address=entry.data[CONF_ADDRESS],
+                    address=address,
                     verify_checksum=entry_option(
                         entry, CONF_VERIFY_CHECKSUM, DEFAULT_VERIFY_CHECKSUM
                     ),
@@ -163,7 +164,7 @@ class SolarmaxConnectionRepairFlow(RepairsFlow):
                     return self.async_abort(reason="issue_missing")
                 issue = current_issue
                 if find_endpoint_conflict(
-                    self.hass, host, port, exclude_entry_id=entry.entry_id
+                    self.hass, host, port, address, exclude_entry_id=entry.entry_id
                 ):
                     return self.async_abort(reason="already_configured")
                 self._set_pending(issue, True, target_endpoint)
