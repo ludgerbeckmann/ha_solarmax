@@ -498,15 +498,16 @@ class ConnectionEngine:
     async def _request_with_retry(
         self, payload: str
     ) -> dict[str, dict[str, float | int]]:
-        """Fetch a payload, retrying once for timeout or corrupt data."""
+        """Fetch a payload, retrying once for a dropped link or corrupt data."""
         try:
             raw = await self._link.request(payload)
-        except LinkTimeout:
+        except (LinkTimeout, LinkClosed) as err:
             _LOGGER.debug(
-                "%s:%s address %d: retrying once after a timeout",
+                "%s:%s address %d: retrying once after %s",
                 self._link.host,
                 self._link.port,
                 self._address,
+                type(err).__name__,
             )
             raw = await self._link.request(payload)
         try:
