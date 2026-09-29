@@ -20,10 +20,16 @@
           "device_name": "Nom de l'appareil",
           "verify_checksum": "Vérifier le checksum de la réponse",
           "night_keep_values": "Conserver les valeurs des capteurs la nuit",
-          "twilight_elevation_threshold": "Seuil d'élévation crépusculaire (degrés)"
+          "twilight_elevation_threshold": "Seuil d'élévation crépusculaire (degrés)",
+          "notify_mode": "Notification de défaut de connexion",
+          "notify_service": "Service de notification push",
+          "notify_timing": "Moment de la notification",
+          "notify_recovery": "Notifier le retour en ligne"
         },
         "data_description": {
-          "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube)."
+          "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube).",
+          "notify_mode": "Comment être notifié des défauts de connexion. « Comme le groupe » reprend les réglages de notification du groupe.",
+          "notify_service": "Service notify à utiliser lorsque la notification push est sélectionnée."
         }
       },
       "group": {
@@ -73,17 +79,31 @@
           "update_interval": "Intervalle de mise à jour (secondes)",
           "twilight_elevation_threshold": "Seuil d'élévation crépusculaire (degrés)",
           "verify_checksum": "Vérifier la somme de contrôle de la réponse",
-          "night_keep_values": "Conserver les valeurs des capteurs la nuit"
+          "night_keep_values": "Conserver les valeurs des capteurs la nuit",
+          "notify_mode": "Notification de défaut de connexion",
+          "notify_service": "Service de notification push",
+          "notify_timing": "Moment de la notification",
+          "notify_recovery": "Notifier le retour en ligne"
         },
         "data_description": {
-          "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube)."
+          "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube).",
+          "notify_mode": "Comment être notifié des défauts de connexion. « Comme le groupe » reprend les réglages de notification du groupe.",
+          "notify_service": "Service notify à utiliser lorsque la notification push est sélectionnée."
         }
       },
       "group_members": {
         "title": "Groupe SolarMax",
         "description": "Choisissez quels onduleurs configurés sont additionnés dans ce groupe. Tous sont inclus par défaut.",
         "data": {
-          "group_members": "Onduleurs à inclure"
+          "group_members": "Onduleurs à inclure",
+          "notify_mode": "Notification de défaut de connexion par défaut",
+          "notify_service": "Service de notification push",
+          "notify_timing": "Moment de la notification",
+          "notify_recovery": "Notifier le retour en ligne"
+        },
+        "data_description": {
+          "notify_mode": "Valeur par défaut pour les onduleurs réglés sur « Comme le groupe ». Le groupe lui-même n'a pas de connexion propre.",
+          "notify_service": "Service notify à utiliser lorsque la notification push est sélectionnée."
         }
       }
     },
@@ -116,6 +136,22 @@
           "repair_pending_verification": "Connexion enregistrée. La réparation reste ouverte jusqu'à la réussite d'une mise à jour complète de l'onduleur.",
           "issue_missing": "Le problème de réparation n'existe plus."
         }
+      }
+    }
+  },
+  "selector": {
+    "notify_mode": {
+      "options": {
+        "inherit": "Comme le groupe (par défaut)",
+        "off": "Désactivé",
+        "persistent": "Notification permanente",
+        "push": "Notification push"
+      }
+    },
+    "notify_timing": {
+      "options": {
+        "immediate": "Immédiatement à la détection",
+        "delayed": "Après 5 minutes (comme la réparation)"
       }
     }
   },

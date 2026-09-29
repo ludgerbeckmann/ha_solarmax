@@ -20,11 +20,19 @@ from .const import (
     CONF_HOST,
     CONF_IS_GROUP,
     CONF_NIGHT_KEEP_VALUES,
+    CONF_NOTIFY_MODE,
+    CONF_NOTIFY_RECOVERY,
+    CONF_NOTIFY_SERVICE,
+    CONF_NOTIFY_TIMING,
     CONF_PORT,
     CONF_TWILIGHT_ELEVATION_THRESHOLD,
     CONF_UPDATE_INTERVAL,
     CONF_VERIFY_CHECKSUM,
     DEFAULT_NIGHT_KEEP_VALUES,
+    DEFAULT_NOTIFY_MODE_INVERTER,
+    DEFAULT_NOTIFY_RECOVERY,
+    DEFAULT_NOTIFY_SERVICE,
+    DEFAULT_NOTIFY_TIMING,
     DEFAULT_PORT,
     DEFAULT_TWILIGHT_ELEVATION_THRESHOLD,
     DEFAULT_UPDATE_INTERVAL,
@@ -42,12 +50,20 @@ OPTION_KEYS = (
     CONF_VERIFY_CHECKSUM,
     CONF_TWILIGHT_ELEVATION_THRESHOLD,
     CONF_NIGHT_KEEP_VALUES,
+    CONF_NOTIFY_MODE,
+    CONF_NOTIFY_SERVICE,
+    CONF_NOTIFY_TIMING,
+    CONF_NOTIFY_RECOVERY,
 )
 OPTION_DEFAULTS = {
     CONF_UPDATE_INTERVAL: DEFAULT_UPDATE_INTERVAL,
     CONF_VERIFY_CHECKSUM: DEFAULT_VERIFY_CHECKSUM,
     CONF_TWILIGHT_ELEVATION_THRESHOLD: DEFAULT_TWILIGHT_ELEVATION_THRESHOLD,
     CONF_NIGHT_KEEP_VALUES: DEFAULT_NIGHT_KEEP_VALUES,
+    CONF_NOTIFY_MODE: DEFAULT_NOTIFY_MODE_INVERTER,
+    CONF_NOTIFY_SERVICE: DEFAULT_NOTIFY_SERVICE,
+    CONF_NOTIFY_TIMING: DEFAULT_NOTIFY_TIMING,
+    CONF_NOTIFY_RECOVERY: DEFAULT_NOTIFY_RECOVERY,
 }
 
 class CannotConnect(HomeAssistantError):
@@ -258,6 +274,18 @@ def inverter_entries(hass: HomeAssistant) -> list[ConfigEntry]:
         for entry in hass.config_entries.async_entries(DOMAIN)
         if not entry.data.get(CONF_IS_GROUP, False)
     ]
+
+
+def group_entry(hass: HomeAssistant) -> ConfigEntry | None:
+    """Return the single group entry, if one is configured."""
+    return next(
+        (
+            entry
+            for entry in hass.config_entries.async_entries(DOMAIN)
+            if entry.data.get(CONF_IS_GROUP, False)
+        ),
+        None,
+    )
 
 
 async def validate_connection(

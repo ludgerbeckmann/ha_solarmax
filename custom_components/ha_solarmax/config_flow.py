@@ -34,6 +34,10 @@ from .const import (
     CONF_HOST,
     CONF_IS_GROUP,
     CONF_NIGHT_KEEP_VALUES,
+    CONF_NOTIFY_MODE,
+    CONF_NOTIFY_RECOVERY,
+    CONF_NOTIFY_SERVICE,
+    CONF_NOTIFY_TIMING,
     CONF_PORT,
     CONF_TWILIGHT_ELEVATION_THRESHOLD,
     CONF_UPDATE_INTERVAL,
@@ -42,12 +46,23 @@ from .const import (
     DEFAULT_DEVICE_NAME,
     DEFAULT_GROUP_DEVICE_NAME,
     DEFAULT_NIGHT_KEEP_VALUES,
+    DEFAULT_NOTIFY_MODE_GROUP,
+    DEFAULT_NOTIFY_MODE_INVERTER,
+    DEFAULT_NOTIFY_RECOVERY,
+    DEFAULT_NOTIFY_SERVICE,
+    DEFAULT_NOTIFY_TIMING,
     DEFAULT_PORT,
     DEFAULT_TWILIGHT_ELEVATION_THRESHOLD,
     DEFAULT_UPDATE_INTERVAL,
     DEFAULT_VERIFY_CHECKSUM,
     DOMAIN,
     GROUP_UNIQUE_ID,
+    NOTIFY_MODE_INHERIT,
+    NOTIFY_MODE_OFF,
+    NOTIFY_MODE_PERSISTENT,
+    NOTIFY_MODE_PUSH,
+    NOTIFY_TIMING_DELAYED,
+    NOTIFY_TIMING_IMMEDIATE,
 )
 _LOGGER = logging.getLogger(__name__)
 # Plain min/max int fields render as a slider in the HA frontend, which is
@@ -69,6 +84,50 @@ _LOCALIZED_GROUP_DEVICE_NAMES: dict[str, str] = {
     "de": "Wechselrichtergruppe",
     "fr": "Groupe d'onduleurs",
 }
+# Selectable notification modes. The group has no INHERIT option -- it is the
+# top of the inheritance chain and never has a connection fault of its own.
+_NOTIFY_MODES_INVERTER = [
+    NOTIFY_MODE_INHERIT,
+    NOTIFY_MODE_OFF,
+    NOTIFY_MODE_PERSISTENT,
+    NOTIFY_MODE_PUSH,
+]
+_NOTIFY_MODES_GROUP = [NOTIFY_MODE_OFF, NOTIFY_MODE_PERSISTENT, NOTIFY_MODE_PUSH]
+_NOTIFY_TIMINGS = [NOTIFY_TIMING_IMMEDIATE, NOTIFY_TIMING_DELAYED]
+
+
+def _notify_service_selector(hass: HomeAssistant, current: str) -> selector.SelectSelector:
+    """Build a dropdown of registered notify.* services, plus the saved value."""
+    services = sorted(hass.services.async_services().get("notify", {}))
+    if current and current not in services:
+        services = [current, *services]
+    return selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=services,
+            custom_value=True,
+            mode=selector.SelectSelectorMode.DROPDOWN,
+        )
+    )
+
+
+def _notify_mode_selector(modes: list[str]) -> selector.SelectSelector:
+    """Build a translated dropdown for one of the two notification-mode sets."""
+    return selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=modes,
+            translation_key="notify_mode",
+            mode=selector.SelectSelectorMode.DROPDOWN,
+        )
+    )
+
+
+_NOTIFY_TIMING_SELECTOR = selector.SelectSelector(
+    selector.SelectSelectorConfig(
+        options=_NOTIFY_TIMINGS,
+        translation_key="notify_timing",
+        mode=selector.SelectSelectorMode.DROPDOWN,
+    )
+)
 
 
 def _localized_device_name(hass: HomeAssistant) -> str:
@@ -94,10 +153,32 @@ _DEFAULT_VALUES: dict[str, Any] = {
     CONF_VERIFY_CHECKSUM: DEFAULT_VERIFY_CHECKSUM,
     CONF_TWILIGHT_ELEVATION_THRESHOLD: DEFAULT_TWILIGHT_ELEVATION_THRESHOLD,
     CONF_NIGHT_KEEP_VALUES: DEFAULT_NIGHT_KEEP_VALUES,
+    CONF_NOTIFY_MODE: DEFAULT_NOTIFY_MODE_INVERTER,
+    CONF_NOTIFY_SERVICE: DEFAULT_NOTIFY_SERVICE,
+    CONF_NOTIFY_TIMING: DEFAULT_NOTIFY_TIMING,
+    CONF_NOTIFY_RECOVERY: DEFAULT_NOTIFY_RECOVERY,
 }
 
 
-def _build_schema(values: dict[str, Any]) -> vol.Schema:
+def _notify_fields(hass: HomeAssistant, values: Mapping[str, Any]) -> dict[Any, Any]:
+    """Return the four notification fields shared by the inverter schemas."""
+    return {
+        vol.Optional(
+            CONF_NOTIFY_MODE, default=values[CONF_NOTIFY_MODE]
+        ): _notify_mode_selector(_NOTIFY_MODES_INVERTER),
+        vol.Optional(
+            CONF_NOTIFY_SERVICE, default=values[CONF_NOTIFY_SERVICE]
+        ): _notify_service_selector(hass, values[CONF_NOTIFY_SERVICE]),
+        vol.Optional(
+            CONF_NOTIFY_TIMING, default=values[CONF_NOTIFY_TIMING]
+        ): _NOTIFY_TIMING_SELECTOR,
+        vol.Optional(
+            CONF_NOTIFY_RECOVERY, default=values[CONF_NOTIFY_RECOVERY]
+        ): bool,
+    }
+
+
+def _build_schema(hass: HomeAssistant, values: dict[str, Any]) -> vol.Schema:
     """Build the shared config/options schema, pre-filled with the given values."""
     return vol.Schema(
         {
@@ -122,11 +203,12 @@ def _build_schema(values: dict[str, Any]) -> vol.Schema:
                 CONF_TWILIGHT_ELEVATION_THRESHOLD,
                 default=values[CONF_TWILIGHT_ELEVATION_THRESHOLD],
             ): vol.All(vol.Coerce(float), vol.Range(min=0, max=90)),
+            **_notify_fields(hass, values),
         }
     )
 
 
-def _build_options_schema(values: Mapping[str, Any]) -> vol.Schema:
+def _build_options_schema(hass: HomeAssistant, values: Mapping[str, Any]) -> vol.Schema:
     """Build the preference-only options schema."""
     return vol.Schema(
         {
@@ -143,6 +225,7 @@ def _build_options_schema(values: Mapping[str, Any]) -> vol.Schema:
             vol.Optional(
                 CONF_NIGHT_KEEP_VALUES, default=values[CONF_NIGHT_KEEP_VALUES]
             ): bool,
+            **_notify_fields(hass, values),
         }
     )
 
@@ -228,8 +311,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="device",
             data_schema=_build_schema(
+                self.hass,
                 _DEFAULT_VALUES
-                | {CONF_DEVICE_NAME: _localized_device_name(self.hass)}
+                | {CONF_DEVICE_NAME: _localized_device_name(self.hass)},
             ),
             errors=errors,
         )
@@ -362,7 +446,7 @@ class OptionsFlow(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="init",
-            data_schema=_build_options_schema(values),
+            data_schema=_build_options_schema(self.hass, values),
             errors=errors,
         )
 
@@ -393,6 +477,20 @@ class OptionsFlow(config_entries.OptionsFlow):
                     return self.async_create_entry(title="", data=user_input)
         selected = entry_option(entry, CONF_GROUP_MEMBERS, all_ids)
         selected = [entry_id for entry_id in selected if entry_id in all_ids]
+        notify_values = {
+            CONF_NOTIFY_MODE: entry_option(
+                entry, CONF_NOTIFY_MODE, DEFAULT_NOTIFY_MODE_GROUP
+            ),
+            CONF_NOTIFY_SERVICE: entry_option(
+                entry, CONF_NOTIFY_SERVICE, DEFAULT_NOTIFY_SERVICE
+            ),
+            CONF_NOTIFY_TIMING: entry_option(
+                entry, CONF_NOTIFY_TIMING, DEFAULT_NOTIFY_TIMING
+            ),
+            CONF_NOTIFY_RECOVERY: entry_option(
+                entry, CONF_NOTIFY_RECOVERY, DEFAULT_NOTIFY_RECOVERY
+            ),
+        }
         return self.async_show_form(
             step_id="group_members",
             data_schema=vol.Schema(
@@ -414,6 +512,24 @@ class OptionsFlow(config_entries.OptionsFlow):
                             mode=selector.SelectSelectorMode.LIST,
                         )
                     ),
+                    vol.Optional(
+                        CONF_NOTIFY_MODE,
+                        default=notify_values[CONF_NOTIFY_MODE],
+                    ): _notify_mode_selector(_NOTIFY_MODES_GROUP),
+                    vol.Optional(
+                        CONF_NOTIFY_SERVICE,
+                        default=notify_values[CONF_NOTIFY_SERVICE],
+                    ): _notify_service_selector(
+                        self.hass, notify_values[CONF_NOTIFY_SERVICE]
+                    ),
+                    vol.Optional(
+                        CONF_NOTIFY_TIMING,
+                        default=notify_values[CONF_NOTIFY_TIMING],
+                    ): _NOTIFY_TIMING_SELECTOR,
+                    vol.Optional(
+                        CONF_NOTIFY_RECOVERY,
+                        default=notify_values[CONF_NOTIFY_RECOVERY],
+                    ): bool,
                 }
             ),
             errors=errors,

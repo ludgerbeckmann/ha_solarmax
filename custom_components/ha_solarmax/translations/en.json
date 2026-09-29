@@ -20,10 +20,16 @@
           "device_name": "Device name",
           "verify_checksum": "Verify response checksum",
           "night_keep_values": "Keep sensor values overnight",
-          "twilight_elevation_threshold": "Twilight elevation threshold (degrees)"
+          "twilight_elevation_threshold": "Twilight elevation threshold (degrees)",
+          "notify_mode": "Connection-fault notification",
+          "notify_service": "Push notification service",
+          "notify_timing": "Notification timing",
+          "notify_recovery": "Notify when back online"
         },
         "data_description": {
-          "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling)."
+          "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling).",
+          "notify_mode": "How to be notified about connection faults. 'Same as group' inherits the group's notification settings.",
+          "notify_service": "Which notify service to use when Push notification is selected."
         }
       },
       "group": {
@@ -58,7 +64,7 @@
       "reload_failed": "Home Assistant could not activate the new connection. The previous settings were restored."
     },
     "abort": {
-      "already_configured": "Device is already configured",
+      "already_configured": "This inverter is already configured",
       "reconfigure_successful": "The inverter configuration was updated.",
       "group_already_configured": "The inverter group is already configured",
       "group_not_reconfigurable": "The inverter group has nothing to reconfigure"
@@ -73,17 +79,31 @@
           "update_interval": "Update interval (seconds)",
           "verify_checksum": "Verify response checksum",
           "night_keep_values": "Keep sensor values overnight",
-          "twilight_elevation_threshold": "Twilight elevation threshold (degrees)"
+          "twilight_elevation_threshold": "Twilight elevation threshold (degrees)",
+          "notify_mode": "Connection-fault notification",
+          "notify_service": "Push notification service",
+          "notify_timing": "Notification timing",
+          "notify_recovery": "Notify when back online"
         },
         "data_description": {
-          "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling)."
+          "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling).",
+          "notify_mode": "How to be notified about connection faults. 'Same as group' inherits the group's notification settings.",
+          "notify_service": "Which notify service to use when Push notification is selected."
         }
       },
       "group_members": {
         "title": "SolarMax Group",
         "description": "Choose which configured inverters are summed into this group. All of them are included by default.",
         "data": {
-          "group_members": "Inverters to include"
+          "group_members": "Inverters to include",
+          "notify_mode": "Default connection-fault notification",
+          "notify_service": "Push notification service",
+          "notify_timing": "Notification timing",
+          "notify_recovery": "Notify when back online"
+        },
+        "data_description": {
+          "notify_mode": "Default for inverters set to 'Same as group'. The group itself has no connection of its own.",
+          "notify_service": "Which notify service to use when Push notification is selected."
         }
       }
     },
@@ -116,6 +136,22 @@
           "repair_pending_verification": "Connection saved. The repair stays open until a full inverter update succeeds.",
           "issue_missing": "The repair issue no longer exists."
         }
+      }
+    }
+  },
+  "selector": {
+    "notify_mode": {
+      "options": {
+        "inherit": "Same as group (default)",
+        "off": "Off",
+        "persistent": "Persistent notification",
+        "push": "Push notification"
+      }
+    },
+    "notify_timing": {
+      "options": {
+        "immediate": "Immediately when detected",
+        "delayed": "After 5 minutes (same as the repair issue)"
       }
     }
   },
@@ -234,31 +270,6 @@
       },
       "tnl": {
         "name": "Grid Frequency Lower Limit"
-      },
-      "sal": {
-        "name": "Alarm Status",
-        "state": {
-          "no_error": "No error",
-          "external_fault_1": "External fault 1",
-          "insulation_fault_dc": "Insulation fault DC side",
-          "earth_fault_current": "Earth fault current too high",
-          "fuse_break_center_earth": "Fuse break center earth",
-          "external_alarm_2": "External alarm 2",
-          "long_term_temp_limit": "Long-term temperature limitation",
-          "ac_feed_in_error": "AC feed-in error",
-          "external_alarm_4": "External alarm 4",
-          "fan_defect": "Fan defect",
-          "fuse_break": "Fuse break",
-          "temp_sensor_failure": "Temperature sensor failure",
-          "alarm_12": "Alarm 12",
-          "alarm_13": "Alarm 13",
-          "alarm_14": "Alarm 14",
-          "alarm_15": "Alarm 15",
-          "alarm_16": "Alarm 16",
-          "alarm_17": "Alarm 17",
-          "multiple_alarms": "Multiple alarms",
-          "unknown_alarm": "Unknown alarm"
-        }
       },
       "sys": {
         "name": "Status Code",
@@ -379,6 +390,31 @@
           "offline_expected": "Offline (expected)",
           "offline_fault": "Offline (fault)",
           "unknown": "Unknown"
+        }
+      },
+      "sal": {
+        "name": "Alarm Status",
+        "state": {
+          "no_error": "No error",
+          "external_fault_1": "External fault 1",
+          "insulation_fault_dc": "Insulation fault DC side",
+          "earth_fault_current": "Earth fault current too high",
+          "fuse_break_center_earth": "Fuse break center earth",
+          "external_alarm_2": "External alarm 2",
+          "long_term_temp_limit": "Long-term temperature limitation",
+          "ac_feed_in_error": "AC feed-in error",
+          "external_alarm_4": "External alarm 4",
+          "fan_defect": "Fan defect",
+          "fuse_break": "Fuse break",
+          "temp_sensor_failure": "Temperature sensor failure",
+          "alarm_12": "Alarm 12",
+          "alarm_13": "Alarm 13",
+          "alarm_14": "Alarm 14",
+          "alarm_15": "Alarm 15",
+          "alarm_16": "Alarm 16",
+          "alarm_17": "Alarm 17",
+          "multiple_alarms": "Multiple alarms",
+          "unknown_alarm": "Unknown alarm"
         }
       },
       "last_connection_fault": {

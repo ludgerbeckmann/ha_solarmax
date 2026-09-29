@@ -231,6 +231,23 @@ saves the new connection, but the issue remains visible until the inverter
 completes a full online update. You can also use Home Assistant's **Ignore**
 action.
 
+### Fault notifications
+
+Each inverter's options (and the group's) include a **Connection-fault
+notification** setting: off, a persistent notification, or a push
+notification through any registered `notify.*` service. An inverter defaults
+to **Same as group**, which uses the group's setting as a shared default;
+setting an inverter to anything else overrides the group for that inverter
+only. The group itself has no connection of its own — its setting only
+serves as that shared default.
+
+**Notification timing** chooses between notifying as soon as the fault is
+classified, or waiting five minutes (matching the repair issue's own
+threshold) to skip brief blips. **Notify when back online** optionally sends
+a second notification once the fault clears, but only for a fault that was
+actually announced — a blip that resolved before its own timing threshold
+never triggers a "back online" message either.
+
 ### Automations and diagnostics
 
 When relevant, the Status Code entity exposes:
@@ -258,6 +275,8 @@ first such fault. A brief reconnect right after a Home Assistant restart
 or update, and any disconnect the integration can already explain
 (shutdown evidence, or darkness below the twilight threshold), are never
 recorded here — only a fault classified as **Offline (fault)** updates it.
+For a ready-made "notify me" without building your own automation, see
+[Fault notifications](#fault-notifications) above.
 
 ## Sensor values at night
 

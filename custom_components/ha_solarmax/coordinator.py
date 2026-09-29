@@ -7,6 +7,7 @@ from dataclasses import replace
 from datetime import datetime, timedelta
 from typing import Any, cast
 
+from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
 from homeassistant.core import HomeAssistant, State, callback
@@ -26,20 +27,32 @@ from .configuration import (
     acquire_endpoint_link,
     endpoint_unique_id,
     entry_option,
+    group_entry,
     release_endpoint_link,
 )
 from .connection import ConnectionEngine, EngineSnapshot, EngineState
 from .const import (
     CONF_ADDRESS,
+    CONF_DEVICE_NAME,
     CONF_GROUP_MEMBERS,
     CONF_HOST,
     CONF_IS_GROUP,
+    CONF_NOTIFY_MODE,
+    CONF_NOTIFY_RECOVERY,
+    CONF_NOTIFY_SERVICE,
+    CONF_NOTIFY_TIMING,
     CONF_PORT,
     CONF_TWILIGHT_ELEVATION_THRESHOLD,
     CONF_UPDATE_INTERVAL,
     CONF_VERIFY_CHECKSUM,
     DAWN_POLL_SECONDS,
     DEFAULT_ADDRESS,
+    DEFAULT_DEVICE_NAME,
+    DEFAULT_NOTIFY_MODE_GROUP,
+    DEFAULT_NOTIFY_MODE_INVERTER,
+    DEFAULT_NOTIFY_RECOVERY,
+    DEFAULT_NOTIFY_SERVICE,
+    DEFAULT_NOTIFY_TIMING,
     DEFAULT_TWILIGHT_ELEVATION_THRESHOLD,
     DEFAULT_UPDATE_INTERVAL,
     DEFAULT_VERIFY_CHECKSUM,
@@ -53,6 +66,11 @@ from .const import (
     FAULT_REPAIR_SECONDS,
     GROUP_SENSOR_TYPES,
     NIGHT_POLL_SECONDS,
+    NOTIFY_MODE_INHERIT,
+    NOTIFY_MODE_OFF,
+    NOTIFY_MODE_PERSISTENT,
+    NOTIFY_MODE_PUSH,
+    NOTIFY_TIMING_IMMEDIATE,
     REPAIR_PENDING,
     REPAIR_PENDING_ENDPOINT,
 )
@@ -62,6 +80,33 @@ _LOGGER = logging.getLogger(__name__)
 _DAWN_ELEVATION_THRESHOLD = -6.0
 _CLOCK_DAWN_HOUR = 5
 _CLOCK_NIGHT_HOUR = 20
+
+# Runtime notification text has no strings.json translation mechanism to draw
+# on (it is generated at fault time, not shown in a config/options form), so
+# it follows the same hass.config.language lookup already used in
+# config_flow.py for suggested device names, with English as the fallback.
+_NOTIFY_FAULT_TITLE_EN = "Inverter unreachable"
+_NOTIFY_FAULT_MESSAGE_EN = (
+    "{name} ({host}:{port}) has been unreachable for {minutes} minutes."
+)
+_NOTIFY_RECOVERY_TITLE_EN = "Inverter back online"
+_NOTIFY_RECOVERY_MESSAGE_EN = "{name} ({host}:{port}) is back online."
+_LOCALIZED_NOTIFY_FAULT_TITLE: dict[str, str] = {
+    "de": "Wechselrichter nicht erreichbar",
+    "fr": "Onduleur injoignable",
+}
+_LOCALIZED_NOTIFY_FAULT_MESSAGE: dict[str, str] = {
+    "de": "{name} ({host}:{port}) ist seit {minutes} Minuten nicht erreichbar.",
+    "fr": "{name} ({host}:{port}) est injoignable depuis {minutes} minutes.",
+}
+_LOCALIZED_NOTIFY_RECOVERY_TITLE: dict[str, str] = {
+    "de": "Wechselrichter wieder erreichbar",
+    "fr": "Onduleur de nouveau joignable",
+}
+_LOCALIZED_NOTIFY_RECOVERY_MESSAGE: dict[str, str] = {
+    "de": "{name} ({host}:{port}) ist wieder online.",
+    "fr": "{name} ({host}:{port}) est de nouveau en ligne.",
+}
 
 
 class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
@@ -105,6 +150,10 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         self._sun_source = "unknown"
         self._sun_fallback_warned = False
         self.sensor_setup_complete = False
+        # Whether a fault notification was sent for the fault episode still
+        # in progress (if any) -- guards against re-notifying on every poll
+        # and gates a recovery notification to episodes that were announced.
+        self._fault_notified = False
 
         super().__init__(
             hass,
@@ -269,6 +318,7 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
             snapshot = self._restate_as_fault()
 
         await self._async_handle_snapshot(snapshot)
+        await self._async_maybe_notify(snapshot)
         self.update_interval = self._interval_for(snapshot)
         return snapshot
 
@@ -391,6 +441,115 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
     def _clear_repair_issue(self) -> None:
         """End repair bookkeeping for a recovered or reclassified episode."""
         async_delete_issue(self.hass, DOMAIN, self._repair_issue_id)
+
+    def _effective_notify_settings(self) -> tuple[str, str, str, bool]:
+        """Return (mode, service, timing, recovery), resolving INHERIT via the group."""
+        mode = entry_option(self._entry, CONF_NOTIFY_MODE, DEFAULT_NOTIFY_MODE_INVERTER)
+        entry = self._entry
+        if mode == NOTIFY_MODE_INHERIT:
+            entry = group_entry(self.hass)
+            if entry is None:
+                return (NOTIFY_MODE_OFF, "", DEFAULT_NOTIFY_TIMING, False)
+            mode = entry_option(entry, CONF_NOTIFY_MODE, DEFAULT_NOTIFY_MODE_GROUP)
+        return (
+            mode,
+            entry_option(entry, CONF_NOTIFY_SERVICE, DEFAULT_NOTIFY_SERVICE),
+            entry_option(entry, CONF_NOTIFY_TIMING, DEFAULT_NOTIFY_TIMING),
+            entry_option(entry, CONF_NOTIFY_RECOVERY, DEFAULT_NOTIFY_RECOVERY),
+        )
+
+    async def _async_maybe_notify(self, snapshot: EngineSnapshot) -> None:
+        """Notify once per fault episode, and once on recovery if enabled.
+
+        `self.data` is still the previous snapshot here -- the base
+        coordinator assigns the new one only after `_async_update_data`
+        returns -- so a None-to-set transition on `fault_since` reliably
+        marks the start of a new episode.
+        """
+        previous_fault_since = self.data.fault_since if self.data else None
+        if snapshot.fault_since is not None and previous_fault_since is None:
+            self._fault_notified = False
+        mode, service, timing, recovery = self._effective_notify_settings()
+        if mode == NOTIFY_MODE_OFF:
+            return
+        if (
+            snapshot.state is EngineState.OFFLINE_FAULT
+            and not self._fault_notified
+            and self._fault_notification_due(snapshot, timing)
+        ):
+            title, message = self._fault_notification_text(snapshot)
+            await self._send_notification(mode, service, title, message)
+            self._fault_notified = True
+        elif (
+            snapshot.state is EngineState.ONLINE and self._fault_notified and recovery
+        ):
+            title, message = self._recovery_notification_text()
+            await self._send_notification(mode, service, title, message)
+            self._fault_notified = False
+
+    @staticmethod
+    def _fault_notification_due(snapshot: EngineSnapshot, timing: str) -> bool:
+        """Return whether a fault notification is due under the given timing."""
+        if timing == NOTIFY_TIMING_IMMEDIATE:
+            return True
+        if snapshot.fault_since is None:
+            return False
+        fault_seconds = (dt_util.utcnow() - snapshot.fault_since).total_seconds()
+        return fault_seconds >= FAULT_REPAIR_SECONDS
+
+    def _notify_language(self) -> str:
+        return self.hass.config.language.split("-")[0].lower()
+
+    def _fault_notification_text(self, snapshot: EngineSnapshot) -> tuple[str, str]:
+        language = self._notify_language()
+        minutes = 0
+        if snapshot.fault_since is not None:
+            minutes = int((dt_util.utcnow() - snapshot.fault_since).total_seconds() // 60)
+        title = _LOCALIZED_NOTIFY_FAULT_TITLE.get(language, _NOTIFY_FAULT_TITLE_EN)
+        message = _LOCALIZED_NOTIFY_FAULT_MESSAGE.get(
+            language, _NOTIFY_FAULT_MESSAGE_EN
+        ).format(
+            name=self._entry.data.get(CONF_DEVICE_NAME, DEFAULT_DEVICE_NAME),
+            host=self._host,
+            port=self._port,
+            minutes=minutes,
+        )
+        return title, message
+
+    def _recovery_notification_text(self) -> tuple[str, str]:
+        language = self._notify_language()
+        title = _LOCALIZED_NOTIFY_RECOVERY_TITLE.get(
+            language, _NOTIFY_RECOVERY_TITLE_EN
+        )
+        message = _LOCALIZED_NOTIFY_RECOVERY_MESSAGE.get(
+            language, _NOTIFY_RECOVERY_MESSAGE_EN
+        ).format(
+            name=self._entry.data.get(CONF_DEVICE_NAME, DEFAULT_DEVICE_NAME),
+            host=self._host,
+            port=self._port,
+        )
+        return title, message
+
+    async def _send_notification(
+        self, mode: str, service: str, title: str, message: str
+    ) -> None:
+        """Dispatch one notification, never raising back into the poll loop."""
+        if mode == NOTIFY_MODE_PERSISTENT:
+            persistent_notification.async_create(
+                self.hass,
+                message,
+                title=title,
+                notification_id=f"{DOMAIN}_{self._entry.entry_id}_connection",
+            )
+        elif mode == NOTIFY_MODE_PUSH and service:
+            try:
+                await self.hass.services.async_call(
+                    "notify", service, {"title": title, "message": message}
+                )
+            except Exception:
+                _LOGGER.exception(
+                    "Failed to send push notification via notify.%s", service
+                )
 
     def _static_raw(self, key: str) -> Any:
         """Return the raw_value for a static device-info key, or None."""

@@ -24,6 +24,22 @@ CONF_IS_GROUP = "is_group"
 # Entry IDs of the inverters to sum into the group; unset means "all of them".
 CONF_GROUP_MEMBERS = "group_members"
 
+# Connection-fault notification settings. An inverter entry's NOTIFY_MODE_INHERIT
+# resolves to the group entry's own settings (the group has no INHERIT option --
+# it is the top of the inheritance chain and never has its own connection fault).
+CONF_NOTIFY_MODE = "notify_mode"
+CONF_NOTIFY_SERVICE = "notify_service"
+CONF_NOTIFY_TIMING = "notify_timing"
+CONF_NOTIFY_RECOVERY = "notify_recovery"
+
+NOTIFY_MODE_INHERIT = "inherit"
+NOTIFY_MODE_OFF = "off"
+NOTIFY_MODE_PERSISTENT = "persistent"
+NOTIFY_MODE_PUSH = "push"
+
+NOTIFY_TIMING_IMMEDIATE = "immediate"
+NOTIFY_TIMING_DELAYED = "delayed"
+
 # Default values
 DEFAULT_PORT = 12345
 DEFAULT_ADDRESS = 1
@@ -42,6 +58,14 @@ DEFAULT_VERIFY_CHECKSUM = True
 DEFAULT_TWILIGHT_ELEVATION_THRESHOLD = 5
 
 DEFAULT_NIGHT_KEEP_VALUES = True
+
+# An inverter defaults to inheriting the group's notification settings; the
+# group itself defaults to no notifications at all.
+DEFAULT_NOTIFY_MODE_INVERTER = NOTIFY_MODE_INHERIT
+DEFAULT_NOTIFY_MODE_GROUP = NOTIFY_MODE_OFF
+DEFAULT_NOTIFY_SERVICE = ""
+DEFAULT_NOTIFY_TIMING = NOTIFY_TIMING_IMMEDIATE
+DEFAULT_NOTIFY_RECOVERY = False
 
 # Coordinator poll cadence (seconds) when the engine reports OFFLINE_EXPECTED.
 NIGHT_POLL_SECONDS = 900

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-09-29
+
+### Added
+
+- Built-in connection-fault notifications, configurable per inverter and for
+  the inverter group: off, a persistent notification, or a push notification
+  through any registered `notify.*` service (offered as a dropdown). An
+  inverter defaults to inheriting the group's setting; explicitly setting an
+  inverter's own mode overrides the group for that inverter only, since the
+  group has no connection of its own and exists purely as a shared default.
+  A timing choice sends the notification immediately on fault classification
+  or after the same 5-minute threshold as the repair issue, and an optional
+  "notify when back online" setting sends a second notification once a fault
+  that was actually announced clears.
+
 ## [0.10.2] - 2026-09-24
 
 ### Fixed
@@ -498,7 +513,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.2...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.2...v0.11.0
 [0.10.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.9.3...v0.10.0
