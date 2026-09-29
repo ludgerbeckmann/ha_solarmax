@@ -28,7 +28,7 @@ CONF_GROUP_MEMBERS = "group_members"
 # resolves to the group entry's own settings (the group has no INHERIT option --
 # it is the top of the inheritance chain and never has its own connection fault).
 CONF_NOTIFY_MODE = "notify_mode"
-CONF_NOTIFY_SERVICE = "notify_service"
+CONF_NOTIFY_TARGET = "notify_target"
 CONF_NOTIFY_TIMING = "notify_timing"
 CONF_NOTIFY_RECOVERY = "notify_recovery"
 
@@ -63,7 +63,7 @@ DEFAULT_NIGHT_KEEP_VALUES = True
 # group itself defaults to no notifications at all.
 DEFAULT_NOTIFY_MODE_INVERTER = NOTIFY_MODE_INHERIT
 DEFAULT_NOTIFY_MODE_GROUP = NOTIFY_MODE_OFF
-DEFAULT_NOTIFY_SERVICE = ""
+DEFAULT_NOTIFY_TARGET = ""
 DEFAULT_NOTIFY_TIMING = NOTIFY_TIMING_IMMEDIATE
 DEFAULT_NOTIFY_RECOVERY = False
 

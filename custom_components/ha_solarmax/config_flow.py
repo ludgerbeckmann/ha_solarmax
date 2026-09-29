@@ -11,6 +11,7 @@ from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import selector
+from homeassistant.util import slugify
 from .configuration import (
     OPTION_DEFAULTS,
     TCP_PORT_SCHEMA,
@@ -36,7 +37,7 @@ from .const import (
     CONF_NIGHT_KEEP_VALUES,
     CONF_NOTIFY_MODE,
     CONF_NOTIFY_RECOVERY,
-    CONF_NOTIFY_SERVICE,
+    CONF_NOTIFY_TARGET,
     CONF_NOTIFY_TIMING,
     CONF_PORT,
     CONF_TWILIGHT_ELEVATION_THRESHOLD,
@@ -49,7 +50,7 @@ from .const import (
     DEFAULT_NOTIFY_MODE_GROUP,
     DEFAULT_NOTIFY_MODE_INVERTER,
     DEFAULT_NOTIFY_RECOVERY,
-    DEFAULT_NOTIFY_SERVICE,
+    DEFAULT_NOTIFY_TARGET,
     DEFAULT_NOTIFY_TIMING,
     DEFAULT_PORT,
     DEFAULT_TWILIGHT_ELEVATION_THRESHOLD,
@@ -94,16 +95,44 @@ _NOTIFY_MODES_INVERTER = [
 ]
 _NOTIFY_MODES_GROUP = [NOTIFY_MODE_OFF, NOTIFY_MODE_PERSISTENT, NOTIFY_MODE_PUSH]
 _NOTIFY_TIMINGS = [NOTIFY_TIMING_IMMEDIATE, NOTIFY_TIMING_DELAYED]
+# notify.send_message is the entity action (entities are listed separately)
+# and persistent_notification duplicates the Persistent mode.
+_NOTIFY_HIDDEN_SERVICES = frozenset({"send_message", "persistent_notification"})
 
 
-def _notify_service_selector(hass: HomeAssistant, current: str) -> selector.SelectSelector:
-    """Build a dropdown of registered notify.* services, plus the saved value."""
-    services = sorted(hass.services.async_services().get("notify", {}))
-    if current and current not in services:
-        services = [current, *services]
+def _notify_target_selector(hass: HomeAssistant, current: str) -> selector.SelectSelector:
+    """Build a dropdown of notification targets with readable names.
+
+    A stored value is either a notify entity ID (contains a dot) or a legacy
+    notify service name (no dot), so the two can share one field. Entities
+    are labelled with their friendly name; a Companion App service is
+    labelled with its device name, which the service name alone does not
+    carry. Other legacy services have no display name and show as-is.
+    """
+    mobile_app_names = {
+        f"mobile_app_{slugify(name)}": name
+        for entry in hass.config_entries.async_entries("mobile_app")
+        if (name := entry.data.get("device_name", entry.title))
+    }
+    labels = {
+        state.entity_id: f"{state.name} ({state.entity_id})"
+        for state in hass.states.async_all("notify")
+    }
+    for service in hass.services.async_services().get("notify", {}):
+        if service in _NOTIFY_HIDDEN_SERVICES:
+            continue
+        name = mobile_app_names.get(service)
+        labels[service] = f"{name} ({service})" if name else service
+    if current and current not in labels:
+        labels[current] = current
     return selector.SelectSelector(
         selector.SelectSelectorConfig(
-            options=services,
+            options=[
+                selector.SelectOptionDict(value=value, label=label)
+                for value, label in sorted(
+                    labels.items(), key=lambda item: item[1].casefold()
+                )
+            ],
             custom_value=True,
             mode=selector.SelectSelectorMode.DROPDOWN,
         )
@@ -154,7 +183,7 @@ _DEFAULT_VALUES: dict[str, Any] = {
     CONF_TWILIGHT_ELEVATION_THRESHOLD: DEFAULT_TWILIGHT_ELEVATION_THRESHOLD,
     CONF_NIGHT_KEEP_VALUES: DEFAULT_NIGHT_KEEP_VALUES,
     CONF_NOTIFY_MODE: DEFAULT_NOTIFY_MODE_INVERTER,
-    CONF_NOTIFY_SERVICE: DEFAULT_NOTIFY_SERVICE,
+    CONF_NOTIFY_TARGET: DEFAULT_NOTIFY_TARGET,
     CONF_NOTIFY_TIMING: DEFAULT_NOTIFY_TIMING,
     CONF_NOTIFY_RECOVERY: DEFAULT_NOTIFY_RECOVERY,
 }
@@ -167,8 +196,8 @@ def _notify_fields(hass: HomeAssistant, values: Mapping[str, Any]) -> dict[Any, 
             CONF_NOTIFY_MODE, default=values[CONF_NOTIFY_MODE]
         ): _notify_mode_selector(_NOTIFY_MODES_INVERTER),
         vol.Optional(
-            CONF_NOTIFY_SERVICE, default=values[CONF_NOTIFY_SERVICE]
-        ): _notify_service_selector(hass, values[CONF_NOTIFY_SERVICE]),
+            CONF_NOTIFY_TARGET, default=values[CONF_NOTIFY_TARGET]
+        ): _notify_target_selector(hass, values[CONF_NOTIFY_TARGET]),
         vol.Optional(
             CONF_NOTIFY_TIMING, default=values[CONF_NOTIFY_TIMING]
         ): _NOTIFY_TIMING_SELECTOR,
@@ -481,8 +510,8 @@ class OptionsFlow(config_entries.OptionsFlow):
             CONF_NOTIFY_MODE: entry_option(
                 entry, CONF_NOTIFY_MODE, DEFAULT_NOTIFY_MODE_GROUP
             ),
-            CONF_NOTIFY_SERVICE: entry_option(
-                entry, CONF_NOTIFY_SERVICE, DEFAULT_NOTIFY_SERVICE
+            CONF_NOTIFY_TARGET: entry_option(
+                entry, CONF_NOTIFY_TARGET, DEFAULT_NOTIFY_TARGET
             ),
             CONF_NOTIFY_TIMING: entry_option(
                 entry, CONF_NOTIFY_TIMING, DEFAULT_NOTIFY_TIMING
@@ -517,10 +546,10 @@ class OptionsFlow(config_entries.OptionsFlow):
                         default=notify_values[CONF_NOTIFY_MODE],
                     ): _notify_mode_selector(_NOTIFY_MODES_GROUP),
                     vol.Optional(
-                        CONF_NOTIFY_SERVICE,
-                        default=notify_values[CONF_NOTIFY_SERVICE],
-                    ): _notify_service_selector(
-                        self.hass, notify_values[CONF_NOTIFY_SERVICE]
+                        CONF_NOTIFY_TARGET,
+                        default=notify_values[CONF_NOTIFY_TARGET],
+                    ): _notify_target_selector(
+                        self.hass, notify_values[CONF_NOTIFY_TARGET]
                     ),
                     vol.Optional(
                         CONF_NOTIFY_TIMING,

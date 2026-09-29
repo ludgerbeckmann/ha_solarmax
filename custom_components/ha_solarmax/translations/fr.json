@@ -22,14 +22,14 @@
           "night_keep_values": "Conserver les valeurs des capteurs la nuit",
           "twilight_elevation_threshold": "Seuil d'élévation crépusculaire (degrés)",
           "notify_mode": "Notification de défaut de connexion",
-          "notify_service": "Service de notification push",
+          "notify_target": "Cible de notification push",
           "notify_timing": "Moment de la notification",
           "notify_recovery": "Notifier le retour en ligne"
         },
         "data_description": {
           "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube).",
           "notify_mode": "Comment être notifié des défauts de connexion. « Comme le groupe » reprend les réglages de notification du groupe.",
-          "notify_service": "Service notify à utiliser lorsque la notification push est sélectionnée."
+          "notify_target": "Appareil ou cible de notification qui reçoit la notification push."
         }
       },
       "group": {
@@ -81,14 +81,14 @@
           "verify_checksum": "Vérifier la somme de contrôle de la réponse",
           "night_keep_values": "Conserver les valeurs des capteurs la nuit",
           "notify_mode": "Notification de défaut de connexion",
-          "notify_service": "Service de notification push",
+          "notify_target": "Cible de notification push",
           "notify_timing": "Moment de la notification",
           "notify_recovery": "Notifier le retour en ligne"
         },
         "data_description": {
           "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube).",
           "notify_mode": "Comment être notifié des défauts de connexion. « Comme le groupe » reprend les réglages de notification du groupe.",
-          "notify_service": "Service notify à utiliser lorsque la notification push est sélectionnée."
+          "notify_target": "Appareil ou cible de notification qui reçoit la notification push."
         }
       },
       "group_members": {
@@ -97,13 +97,13 @@
         "data": {
           "group_members": "Onduleurs à inclure",
           "notify_mode": "Notification de défaut de connexion par défaut",
-          "notify_service": "Service de notification push",
+          "notify_target": "Cible de notification push",
           "notify_timing": "Moment de la notification",
           "notify_recovery": "Notifier le retour en ligne"
         },
         "data_description": {
           "notify_mode": "Valeur par défaut pour les onduleurs réglés sur « Comme le groupe ». Le groupe lui-même n'a pas de connexion propre.",
-          "notify_service": "Service notify à utiliser lorsque la notification push est sélectionnée."
+          "notify_target": "Appareil ou cible de notification qui reçoit la notification push."
         }
       }
     },

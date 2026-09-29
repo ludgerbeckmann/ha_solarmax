@@ -235,7 +235,8 @@ action.
 
 Each inverter's options (and the group's) include a **Connection-fault
 notification** setting: off, a persistent notification, or a push
-notification through any registered `notify.*` service. An inverter defaults
+notification sent to a **notification target** -- a notify entity or a
+Companion App device, listed by its display name. An inverter defaults
 to **Same as group**, which uses the group's setting as a shared default;
 setting an inverter to anything else overrides the group for that inverter
 only. The group itself has no connection of its own — its setting only

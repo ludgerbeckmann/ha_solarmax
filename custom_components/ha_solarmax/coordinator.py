@@ -39,7 +39,7 @@ from .const import (
     CONF_IS_GROUP,
     CONF_NOTIFY_MODE,
     CONF_NOTIFY_RECOVERY,
-    CONF_NOTIFY_SERVICE,
+    CONF_NOTIFY_TARGET,
     CONF_NOTIFY_TIMING,
     CONF_PORT,
     CONF_TWILIGHT_ELEVATION_THRESHOLD,
@@ -51,7 +51,7 @@ from .const import (
     DEFAULT_NOTIFY_MODE_GROUP,
     DEFAULT_NOTIFY_MODE_INVERTER,
     DEFAULT_NOTIFY_RECOVERY,
-    DEFAULT_NOTIFY_SERVICE,
+    DEFAULT_NOTIFY_TARGET,
     DEFAULT_NOTIFY_TIMING,
     DEFAULT_TWILIGHT_ELEVATION_THRESHOLD,
     DEFAULT_UPDATE_INTERVAL,
@@ -318,7 +318,7 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
             snapshot = self._restate_as_fault()
 
         await self._async_handle_snapshot(snapshot)
-        await self._async_maybe_notify(snapshot)
+        self._maybe_notify(snapshot)
         self.update_interval = self._interval_for(snapshot)
         return snapshot
 
@@ -443,7 +443,7 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         async_delete_issue(self.hass, DOMAIN, self._repair_issue_id)
 
     def _effective_notify_settings(self) -> tuple[str, str, str, bool]:
-        """Return (mode, service, timing, recovery), resolving INHERIT via the group."""
+        """Return (mode, target, timing, recovery), resolving INHERIT via the group."""
         mode = entry_option(self._entry, CONF_NOTIFY_MODE, DEFAULT_NOTIFY_MODE_INVERTER)
         entry = self._entry
         if mode == NOTIFY_MODE_INHERIT:
@@ -453,12 +453,13 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
             mode = entry_option(entry, CONF_NOTIFY_MODE, DEFAULT_NOTIFY_MODE_GROUP)
         return (
             mode,
-            entry_option(entry, CONF_NOTIFY_SERVICE, DEFAULT_NOTIFY_SERVICE),
+            entry_option(entry, CONF_NOTIFY_TARGET, DEFAULT_NOTIFY_TARGET),
             entry_option(entry, CONF_NOTIFY_TIMING, DEFAULT_NOTIFY_TIMING),
             entry_option(entry, CONF_NOTIFY_RECOVERY, DEFAULT_NOTIFY_RECOVERY),
         )
 
-    async def _async_maybe_notify(self, snapshot: EngineSnapshot) -> None:
+    @callback
+    def _maybe_notify(self, snapshot: EngineSnapshot) -> None:
         """Notify once per fault episode, and once on recovery if enabled.
 
         `self.data` is still the previous snapshot here -- the base
@@ -469,7 +470,7 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         previous_fault_since = self.data.fault_since if self.data else None
         if snapshot.fault_since is not None and previous_fault_since is None:
             self._fault_notified = False
-        mode, service, timing, recovery = self._effective_notify_settings()
+        mode, target, timing, recovery = self._effective_notify_settings()
         if mode == NOTIFY_MODE_OFF:
             return
         if (
@@ -478,13 +479,13 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
             and self._fault_notification_due(snapshot, timing)
         ):
             title, message = self._fault_notification_text(snapshot)
-            await self._send_notification(mode, service, title, message)
+            self._send_notification(mode, target, title, message)
             self._fault_notified = True
         elif (
             snapshot.state is EngineState.ONLINE and self._fault_notified and recovery
         ):
             title, message = self._recovery_notification_text()
-            await self._send_notification(mode, service, title, message)
+            self._send_notification(mode, target, title, message)
             self._fault_notified = False
 
     @staticmethod
@@ -530,10 +531,10 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         )
         return title, message
 
-    async def _send_notification(
-        self, mode: str, service: str, title: str, message: str
+    def _send_notification(
+        self, mode: str, target: str, title: str, message: str
     ) -> None:
-        """Dispatch one notification, never raising back into the poll loop."""
+        """Dispatch one notification without blocking or raising into the poll."""
         if mode == NOTIFY_MODE_PERSISTENT:
             persistent_notification.async_create(
                 self.hass,
@@ -541,15 +542,34 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
                 title=title,
                 notification_id=f"{DOMAIN}_{self._entry.entry_id}_connection",
             )
-        elif mode == NOTIFY_MODE_PUSH and service:
-            try:
+        elif mode == NOTIFY_MODE_PUSH and target:
+            self.hass.async_create_task(
+                self._async_push(target, title, message),
+                f"send SolarMax notification {self._entry.entry_id}",
+            )
+
+    async def _async_push(self, target: str, title: str, message: str) -> None:
+        """Send a push notification to a notify entity or a legacy notify service.
+
+        Runs as its own task and waits for the service to finish so a failure
+        is logged, while an unreachable target cannot stall the next poll.
+        """
+        data = {"title": title, "message": message}
+        try:
+            if "." in target:
                 await self.hass.services.async_call(
-                    "notify", service, {"title": title, "message": message}
+                    "notify",
+                    "send_message",
+                    data,
+                    blocking=True,
+                    target={"entity_id": target},
                 )
-            except Exception:
-                _LOGGER.exception(
-                    "Failed to send push notification via notify.%s", service
+            else:
+                await self.hass.services.async_call(
+                    "notify", target, data, blocking=True
                 )
+        except Exception:
+            _LOGGER.exception("Failed to send push notification to %s", target)
 
     def _static_raw(self, key: str) -> Any:
         """Return the raw_value for a static device-info key, or None."""

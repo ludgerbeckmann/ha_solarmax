@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-09-29
+
+### Changed
+
+- The push destination of the connection-fault notifications is now called
+  a "notification target" and is listed by display name instead of only the
+  raw service name: notify entities show their friendly name, and Companion
+  App services show the device name. Notify entities are now supported
+  (sent through `notify.send_message`) alongside the classic notify
+  services. The push is also sent in the background, so an unreachable
+  target can no longer delay the next inverter poll, and a failed send is
+  logged. The stored option was renamed from `notify_service` to
+  `notify_target`; a push destination saved with 0.11.0 must be selected
+  again.
+
 ## [0.11.0] - 2026-09-29
 
 ### Added
@@ -513,7 +528,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.1...HEAD
+[0.11.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.2...v0.11.0
 [0.10.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.0...v0.10.1

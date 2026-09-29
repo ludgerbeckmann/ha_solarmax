@@ -22,14 +22,14 @@
           "night_keep_values": "Keep sensor values overnight",
           "twilight_elevation_threshold": "Twilight elevation threshold (degrees)",
           "notify_mode": "Connection-fault notification",
-          "notify_service": "Push notification service",
+          "notify_target": "Push notification target",
           "notify_timing": "Notification timing",
           "notify_recovery": "Notify when back online"
         },
         "data_description": {
           "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling).",
           "notify_mode": "How to be notified about connection faults. 'Same as group' inherits the group's notification settings.",
-          "notify_service": "Which notify service to use when Push notification is selected."
+          "notify_target": "Which device or notify target receives the push notification."
         }
       },
       "group": {
@@ -81,14 +81,14 @@
           "night_keep_values": "Keep sensor values overnight",
           "twilight_elevation_threshold": "Twilight elevation threshold (degrees)",
           "notify_mode": "Connection-fault notification",
-          "notify_service": "Push notification service",
+          "notify_target": "Push notification target",
           "notify_timing": "Notification timing",
           "notify_recovery": "Notify when back online"
         },
         "data_description": {
           "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling).",
           "notify_mode": "How to be notified about connection faults. 'Same as group' inherits the group's notification settings.",
-          "notify_service": "Which notify service to use when Push notification is selected."
+          "notify_target": "Which device or notify target receives the push notification."
         }
       },
       "group_members": {
@@ -97,13 +97,13 @@
         "data": {
           "group_members": "Inverters to include",
           "notify_mode": "Default connection-fault notification",
-          "notify_service": "Push notification service",
+          "notify_target": "Push notification target",
           "notify_timing": "Notification timing",
           "notify_recovery": "Notify when back online"
         },
         "data_description": {
           "notify_mode": "Default for inverters set to 'Same as group'. The group itself has no connection of its own.",
-          "notify_service": "Which notify service to use when Push notification is selected."
+          "notify_target": "Which device or notify target receives the push notification."
         }
       }
     },
