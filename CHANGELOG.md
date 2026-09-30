@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.4] - 2026-09-30
+
+### Changed
+
+- Kept the former SolarMax brand images as a maintainer reference in
+  `archive/original-brand/`, outside `custom_components/`. They are not part
+  of the integration, are not installed by HACS and are excluded from the
+  repository's MIT license. No change to the integration itself.
+
 ## [0.11.3] - 2026-09-30
 
 ### Changed
@@ -548,7 +557,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.3...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.4...HEAD
+[0.11.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.0...v0.11.1
