@@ -10,6 +10,11 @@ the MaxComm TCP protocol on your local network. It reads production, energy
 totals, operating status, alarms, and diagnostic measurements without a cloud
 account.
 
+This integration is for **older SolarMax inverters that offer the MaxComm
+TCP protocol**. Inverters with only Modbus, serial, or cloud access, which
+includes newer models, are not supported. See
+[Supported inverters](#supported-inverters) for details.
+
 ## At a glance
 
 - Local, read-only communication with no cloud account
@@ -19,6 +24,7 @@ account.
 - Clear states for normal shutdowns and unexpected connection faults
 - Optional inverter group with automatic sum entities across every inverter
 - Native reconfiguration and repair flows in Home Assistant
+- Optional fault notifications as a persistent or push notification
 - English, German, and French translations
 
 ## Before you install

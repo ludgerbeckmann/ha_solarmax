@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.5] - 2026-09-30
+
+### Changed
+
+- README: state up front that the integration targets older SolarMax
+  inverters with the MaxComm TCP protocol, and mention the optional fault
+  notifications in the feature list.
+
 ## [0.11.4] - 2026-09-30
 
 ### Changed
@@ -557,7 +565,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.4...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.5...HEAD
+[0.11.5]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.1...v0.11.2
