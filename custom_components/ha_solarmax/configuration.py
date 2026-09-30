@@ -314,7 +314,7 @@ def split_entry_input(
     """Split config entry input into connection data and preference options."""
     return (
         {key: values[key] for key in CONNECTION_KEYS},
-        {key: values[key] for key in OPTION_KEYS},
+        {key: values.get(key, OPTION_DEFAULTS[key]) for key in OPTION_KEYS},
     )
 
 

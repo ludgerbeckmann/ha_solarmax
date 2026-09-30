@@ -29,7 +29,7 @@
         "data_description": {
           "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling).",
           "notify_mode": "How to be notified about connection faults. 'Same as group' inherits the group's notification settings.",
-          "notify_target": "Which device or notify target receives the push notification."
+          "notify_target": "Which Companion App device receives the push notification."
         }
       },
       "group": {
@@ -88,7 +88,7 @@
         "data_description": {
           "twilight_elevation_threshold": "Sun elevation below which an unannounced disconnect counts as expected (also starts fast dawn polling).",
           "notify_mode": "How to be notified about connection faults. 'Same as group' inherits the group's notification settings.",
-          "notify_target": "Which device or notify target receives the push notification."
+          "notify_target": "Which Companion App device receives the push notification."
         }
       },
       "group_members": {
@@ -103,7 +103,7 @@
         },
         "data_description": {
           "notify_mode": "Default for inverters set to 'Same as group'. The group itself has no connection of its own.",
-          "notify_target": "Which device or notify target receives the push notification."
+          "notify_target": "Which Companion App device receives the push notification."
         }
       }
     },

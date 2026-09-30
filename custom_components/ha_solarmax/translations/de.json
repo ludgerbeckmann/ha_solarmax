@@ -29,7 +29,7 @@
         "data_description": {
           "twilight_elevation_threshold": "Sonnenhöhenwinkel, unterhalb dessen eine unangekündigte Verbindungstrennung als erwartet gilt (startet außerdem die schnellere Abfrage in der Dämmerung).",
           "notify_mode": "Wie bei Verbindungsfehlern benachrichtigt werden soll. „Wie Gruppe“ übernimmt die Benachrichtigungseinstellungen der Gruppe.",
-          "notify_target": "Welches Gerät bzw. Benachrichtigungsziel die Push-Benachrichtigung erhält."
+          "notify_target": "Welches Companion-App-Gerät die Push-Benachrichtigung erhält."
         }
       },
       "group": {
@@ -88,7 +88,7 @@
         "data_description": {
           "twilight_elevation_threshold": "Sonnenhöhenwinkel, unterhalb dessen eine unangekündigte Verbindungstrennung als erwartet gilt (startet außerdem die schnellere Abfrage in der Dämmerung).",
           "notify_mode": "Wie bei Verbindungsfehlern benachrichtigt werden soll. „Wie Gruppe“ übernimmt die Benachrichtigungseinstellungen der Gruppe.",
-          "notify_target": "Welches Gerät bzw. Benachrichtigungsziel die Push-Benachrichtigung erhält."
+          "notify_target": "Welches Companion-App-Gerät die Push-Benachrichtigung erhält."
         }
       },
       "group_members": {
@@ -103,7 +103,7 @@
         },
         "data_description": {
           "notify_mode": "Standard für Wechselrichter, die auf „Wie Gruppe“ eingestellt sind. Die Gruppe selbst hat keine eigene Verbindung.",
-          "notify_target": "Welches Gerät bzw. Benachrichtigungsziel die Push-Benachrichtigung erhält."
+          "notify_target": "Welches Companion-App-Gerät die Push-Benachrichtigung erhält."
         }
       }
     },

@@ -95,48 +95,37 @@ _NOTIFY_MODES_INVERTER = [
 ]
 _NOTIFY_MODES_GROUP = [NOTIFY_MODE_OFF, NOTIFY_MODE_PERSISTENT, NOTIFY_MODE_PUSH]
 _NOTIFY_TIMINGS = [NOTIFY_TIMING_IMMEDIATE, NOTIFY_TIMING_DELAYED]
-# notify.send_message is the entity action (entities are listed separately)
-# and persistent_notification duplicates the Persistent mode.
-_NOTIFY_HIDDEN_SERVICES = frozenset({"send_message", "persistent_notification"})
 
 
-def _notify_target_selector(hass: HomeAssistant, current: str) -> selector.SelectSelector:
-    """Build a dropdown of notification targets with readable names.
+def _notify_target_field(hass: HomeAssistant, current: str) -> dict[Any, Any]:
+    """Build the push-target field: Companion App devices, by display name.
 
-    A stored value is either a notify entity ID (contains a dot) or a legacy
-    notify service name (no dot), so the two can share one field. Entities
-    are labelled with their friendly name; a Companion App service is
-    labelled with its device name, which the service name alone does not
-    carry. Other legacy services have no display name and show as-is.
+    The stored value is the notify service name (mobile_app_<device>). A
+    device only shows once Home Assistant has registered its service. The
+    saved value is suggested only while it is still a valid choice, so a
+    device that no longer exists cannot block saving the form.
     """
-    mobile_app_names = {
-        f"mobile_app_{slugify(name)}": name
-        for entry in hass.config_entries.async_entries("mobile_app")
-        if (name := entry.data.get("device_name", entry.title))
-    }
-    labels = {
-        state.entity_id: f"{state.name} ({state.entity_id})"
-        for state in hass.states.async_all("notify")
-    }
-    for service in hass.services.async_services().get("notify", {}):
-        if service in _NOTIFY_HIDDEN_SERVICES:
-            continue
-        name = mobile_app_names.get(service)
-        labels[service] = f"{name} ({service})" if name else service
-    if current and current not in labels:
-        labels[current] = current
-    return selector.SelectSelector(
-        selector.SelectSelectorConfig(
-            options=[
-                selector.SelectOptionDict(value=value, label=label)
-                for value, label in sorted(
-                    labels.items(), key=lambda item: item[1].casefold()
-                )
-            ],
-            custom_value=True,
-            mode=selector.SelectSelectorMode.DROPDOWN,
-        )
+    services = hass.services.async_services().get("notify", {})
+    options = sorted(
+        (
+            selector.SelectOptionDict(value=service, label=name)
+            for entry in hass.config_entries.async_entries("mobile_app")
+            if (name := entry.data.get("device_name", entry.title))
+            and (service := f"mobile_app_{slugify(name)}") in services
+        ),
+        key=lambda option: option["label"].casefold(),
     )
+    known = any(option["value"] == current for option in options)
+    return {
+        vol.Optional(
+            CONF_NOTIFY_TARGET,
+            description={"suggested_value": current} if known else None,
+        ): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=options, mode=selector.SelectSelectorMode.DROPDOWN
+            )
+        )
+    }
 
 
 def _notify_mode_selector(modes: list[str]) -> selector.SelectSelector:
@@ -195,9 +184,7 @@ def _notify_fields(hass: HomeAssistant, values: Mapping[str, Any]) -> dict[Any, 
         vol.Optional(
             CONF_NOTIFY_MODE, default=values[CONF_NOTIFY_MODE]
         ): _notify_mode_selector(_NOTIFY_MODES_INVERTER),
-        vol.Optional(
-            CONF_NOTIFY_TARGET, default=values[CONF_NOTIFY_TARGET]
-        ): _notify_target_selector(hass, values[CONF_NOTIFY_TARGET]),
+        **_notify_target_field(hass, values[CONF_NOTIFY_TARGET]),
         vol.Optional(
             CONF_NOTIFY_TIMING, default=values[CONF_NOTIFY_TIMING]
         ): _NOTIFY_TIMING_SELECTOR,
@@ -545,10 +532,7 @@ class OptionsFlow(config_entries.OptionsFlow):
                         CONF_NOTIFY_MODE,
                         default=notify_values[CONF_NOTIFY_MODE],
                     ): _notify_mode_selector(_NOTIFY_MODES_GROUP),
-                    vol.Optional(
-                        CONF_NOTIFY_TARGET,
-                        default=notify_values[CONF_NOTIFY_TARGET],
-                    ): _notify_target_selector(
+                    **_notify_target_field(
                         self.hass, notify_values[CONF_NOTIFY_TARGET]
                     ),
                     vol.Optional(

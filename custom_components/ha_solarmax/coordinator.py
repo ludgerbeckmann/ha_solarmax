@@ -549,25 +549,15 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
             )
 
     async def _async_push(self, target: str, title: str, message: str) -> None:
-        """Send a push notification to a notify entity or a legacy notify service.
+        """Send a push notification through a Companion App notify service.
 
         Runs as its own task and waits for the service to finish so a failure
-        is logged, while an unreachable target cannot stall the next poll.
+        is logged, while an unreachable device cannot stall the next poll.
         """
-        data = {"title": title, "message": message}
         try:
-            if "." in target:
-                await self.hass.services.async_call(
-                    "notify",
-                    "send_message",
-                    data,
-                    blocking=True,
-                    target={"entity_id": target},
-                )
-            else:
-                await self.hass.services.async_call(
-                    "notify", target, data, blocking=True
-                )
+            await self.hass.services.async_call(
+                "notify", target, {"title": title, "message": message}, blocking=True
+            )
         except Exception:
             _LOGGER.exception("Failed to send push notification to %s", target)
 

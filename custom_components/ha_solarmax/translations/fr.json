@@ -29,7 +29,7 @@
         "data_description": {
           "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube).",
           "notify_mode": "Comment être notifié des défauts de connexion. « Comme le groupe » reprend les réglages de notification du groupe.",
-          "notify_target": "Appareil ou cible de notification qui reçoit la notification push."
+          "notify_target": "Appareil Companion App qui reçoit la notification push."
         }
       },
       "group": {
@@ -88,7 +88,7 @@
         "data_description": {
           "twilight_elevation_threshold": "Élévation du soleil en dessous de laquelle une déconnexion non annoncée est considérée comme attendue (déclenche également l'interrogation rapide à l'aube).",
           "notify_mode": "Comment être notifié des défauts de connexion. « Comme le groupe » reprend les réglages de notification du groupe.",
-          "notify_target": "Appareil ou cible de notification qui reçoit la notification push."
+          "notify_target": "Appareil Companion App qui reçoit la notification push."
         }
       },
       "group_members": {
@@ -103,7 +103,7 @@
         },
         "data_description": {
           "notify_mode": "Valeur par défaut pour les onduleurs réglés sur « Comme le groupe ». Le groupe lui-même n'a pas de connexion propre.",
-          "notify_target": "Appareil ou cible de notification qui reçoit la notification push."
+          "notify_target": "Appareil Companion App qui reçoit la notification push."
         }
       }
     },
