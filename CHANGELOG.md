@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.3] - 2026-09-30
+
+### Changed
+
+- Replaced the brand images with a neutral, self-drawn yellow inverter icon
+  (`brand/icon.png`, `brand/icon@2x.png`). The previous icon and logo were
+  the SolarMax trademark logo, which does not belong in an independent
+  integration's published assets. `brand/logo.png` was removed; HACS only
+  requires the icon.
+
 ## [0.11.2] - 2026-09-30
 
 ### Changed
@@ -538,7 +548,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.2...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.3...HEAD
+[0.11.3]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.10.2...v0.11.0

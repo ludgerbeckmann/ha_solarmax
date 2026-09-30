@@ -33,11 +33,10 @@ Read [docs/architecture.md](docs/architecture.md) before changing connection, po
 
 ## Brand icons
 
-`custom_components/ha_solarmax/brand/` holds the icon/logo shown inside this
-repository, but Home Assistant's UI and the HACS store pull integration
-icons from the central [home-assistant/brands](https://github.com/home-assistant/brands)
-repository. To have the icon show up there too, submit a PR to that repo
-with domain `solarmax` pointing at this integration.
+`custom_components/ha_solarmax/brand/` holds the integration's icon
+(`icon.png`, 256x256, and `icon@2x.png`, 512x512), which Home Assistant and
+HACS read from the repository. HACS requires at least `icon.png`. Keep the
+artwork self-drawn and neutral; do not add the manufacturer's logo.
 
 ## Change requirements
 
