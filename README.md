@@ -35,6 +35,11 @@ You need:
 - A SolarMax inverter that exposes the MaxComm protocol over TCP
 - Network access from Home Assistant to the inverter, normally on port `12345`
 
+The integration icon ships inside the integration (`brand/icon.png`) and is
+shown by Home Assistant 2026.3 or newer. Older versions show a generic
+placeholder instead, which does not affect any function. The HACS store lists
+the icon only once HACS itself supports local brand images.
+
 ### Supported inverters
 
 | Compatibility | Models or protocol |
