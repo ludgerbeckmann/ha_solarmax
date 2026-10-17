@@ -89,6 +89,7 @@ _NOTIFY_FAULT_TITLE_EN = "Inverter unreachable"
 _NOTIFY_FAULT_MESSAGE_EN = (
     "{name} ({host}:{port}) has been unreachable for {minutes} minutes."
 )
+_NOTIFY_FAULT_MESSAGE_NOW_EN = "{name} ({host}:{port}) is unreachable."
 _NOTIFY_RECOVERY_TITLE_EN = "Inverter back online"
 _NOTIFY_RECOVERY_MESSAGE_EN = "{name} ({host}:{port}) is back online."
 _LOCALIZED_NOTIFY_FAULT_TITLE: dict[str, str] = {
@@ -98,6 +99,10 @@ _LOCALIZED_NOTIFY_FAULT_TITLE: dict[str, str] = {
 _LOCALIZED_NOTIFY_FAULT_MESSAGE: dict[str, str] = {
     "de": "{name} ({host}:{port}) ist seit {minutes} Minuten nicht erreichbar.",
     "fr": "{name} ({host}:{port}) est injoignable depuis {minutes} minutes.",
+}
+_LOCALIZED_NOTIFY_FAULT_MESSAGE_NOW: dict[str, str] = {
+    "de": "{name} ({host}:{port}) ist nicht erreichbar.",
+    "fr": "{name} ({host}:{port}) est injoignable.",
 }
 _LOCALIZED_NOTIFY_RECOVERY_TITLE: dict[str, str] = {
     "de": "Wechselrichter wieder erreichbar",
@@ -481,11 +486,14 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
             title, message = self._fault_notification_text(snapshot)
             self._send_notification(mode, target, title, message)
             self._fault_notified = True
-        elif (
-            snapshot.state is EngineState.ONLINE and self._fault_notified and recovery
-        ):
-            title, message = self._recovery_notification_text()
-            self._send_notification(mode, target, title, message)
+        elif snapshot.state is EngineState.ONLINE and self._fault_notified:
+            # The recovery message reuses the fault notification's slot, so it
+            # replaces the stale fault message; without it, remove that message.
+            if recovery:
+                title, message = self._recovery_notification_text()
+                self._send_notification(mode, target, title, message)
+            else:
+                self._clear_notification(mode, target)
             self._fault_notified = False
 
     @staticmethod
@@ -505,11 +513,21 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         language = self._notify_language()
         minutes = 0
         if snapshot.fault_since is not None:
-            minutes = int((dt_util.utcnow() - snapshot.fault_since).total_seconds() // 60)
+            minutes = int(
+                (dt_util.utcnow() - snapshot.fault_since).total_seconds() // 60
+            )
         title = _LOCALIZED_NOTIFY_FAULT_TITLE.get(language, _NOTIFY_FAULT_TITLE_EN)
-        message = _LOCALIZED_NOTIFY_FAULT_MESSAGE.get(
-            language, _NOTIFY_FAULT_MESSAGE_EN
-        ).format(
+        # An immediate notification fires on the first classified fault poll, so
+        # "for 0 minutes" would be noise; only state a duration once it is real.
+        if minutes < 1:
+            template = _LOCALIZED_NOTIFY_FAULT_MESSAGE_NOW.get(
+                language, _NOTIFY_FAULT_MESSAGE_NOW_EN
+            )
+        else:
+            template = _LOCALIZED_NOTIFY_FAULT_MESSAGE.get(
+                language, _NOTIFY_FAULT_MESSAGE_EN
+            )
+        message = template.format(
             name=self._entry.data.get(CONF_DEVICE_NAME, DEFAULT_DEVICE_NAME),
             host=self._host,
             port=self._port,
@@ -531,6 +549,11 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         )
         return title, message
 
+    @property
+    def _notification_id(self) -> str:
+        """Persistent-notification ID and push tag: one slot per inverter."""
+        return f"{DOMAIN}_{self._entry.entry_id}_connection"
+
     def _send_notification(
         self, mode: str, target: str, title: str, message: str
     ) -> None:
@@ -540,15 +563,38 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
                 self.hass,
                 message,
                 title=title,
-                notification_id=f"{DOMAIN}_{self._entry.entry_id}_connection",
+                notification_id=self._notification_id,
             )
         elif mode == NOTIFY_MODE_PUSH and target:
-            self.hass.async_create_task(
-                self._async_push(target, title, message),
-                f"send SolarMax notification {self._entry.entry_id}",
+            self._schedule_push(
+                target,
+                {
+                    "title": title,
+                    "message": message,
+                    "data": {"tag": self._notification_id},
+                },
             )
 
-    async def _async_push(self, target: str, title: str, message: str) -> None:
+    def _clear_notification(self, mode: str, target: str) -> None:
+        """Remove the fault notification once the inverter is reachable again."""
+        if mode == NOTIFY_MODE_PERSISTENT:
+            persistent_notification.async_dismiss(self.hass, self._notification_id)
+        elif mode == NOTIFY_MODE_PUSH and target:
+            self._schedule_push(
+                target,
+                {
+                    "message": "clear_notification",
+                    "data": {"tag": self._notification_id},
+                },
+            )
+
+    def _schedule_push(self, target: str, payload: dict[str, Any]) -> None:
+        self.hass.async_create_task(
+            self._async_push(target, payload),
+            f"send SolarMax notification {self._entry.entry_id}",
+        )
+
+    async def _async_push(self, target: str, payload: dict[str, Any]) -> None:
         """Send a push notification through a Companion App notify service.
 
         Runs as its own task and waits for the service to finish so a failure
@@ -556,7 +602,7 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         """
         try:
             await self.hass.services.async_call(
-                "notify", target, {"title": title, "message": message}, blocking=True
+                "notify", target, payload, blocking=True
             )
         except Exception:
             _LOGGER.exception("Failed to send push notification to %s", target)

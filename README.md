@@ -255,10 +255,13 @@ serves as that shared default.
 
 **Notification timing** chooses between notifying as soon as the fault is
 classified, or waiting five minutes (matching the repair issue's own
-threshold) to skip brief blips. **Notify when back online** optionally sends
-a second notification once the fault clears, but only for a fault that was
-actually announced — a blip that resolved before its own timing threshold
-never triggers a "back online" message either.
+threshold) to skip brief blips. Each inverter has a single notification slot:
+when the fault clears, the "unreachable" message is removed again (for push
+notifications via the Companion App's `clear_notification` with a per-inverter
+tag, for persistent ones by dismissing it). With **Notify when back online**
+enabled, a "back online" message takes its place instead. Only a fault that
+was actually announced is cleared or followed up — a blip that resolved before
+its own timing threshold triggers neither.
 
 ### Automations and diagnostics
 

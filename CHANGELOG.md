@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.7] - 2026-10-17
+
+### Changed
+
+- Fault notifications are now removed once the inverter is reachable again:
+  push notifications are cleared on the Companion App (`clear_notification`,
+  tagged per inverter) and persistent ones are dismissed. With "Notify when
+  back online" enabled, the recovery message replaces the fault message
+  instead of stacking next to it.
+- An immediate fault notification no longer says "for 0 minutes"; the
+  duration is only shown once it is at least one minute.
+
 ## [0.11.6] - 2026-10-02
 
 ### Changed
@@ -573,7 +585,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.6...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.7...HEAD
+[0.11.7]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.6...v0.11.7
 [0.11.6]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.5...v0.11.6
 [0.11.5]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.3...v0.11.4
