@@ -259,7 +259,8 @@ threshold) to skip brief blips. Each inverter has a single notification slot:
 when the fault clears, the "unreachable" message is removed again (for push
 notifications via the Companion App's `clear_notification` with a per-inverter
 tag, for persistent ones by dismissing it). With **Notify when back online**
-enabled, a "back online" message takes its place instead. Only a fault that
+enabled, a "back online" message takes its place instead and states how
+long the inverter was unreachable. Only a fault that
 was actually announced is cleared or followed up — a blip that resolved before
 its own timing threshold triggers neither.
 

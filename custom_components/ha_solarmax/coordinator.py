@@ -92,6 +92,11 @@ _NOTIFY_FAULT_MESSAGE_EN = (
 _NOTIFY_FAULT_MESSAGE_NOW_EN = "{name} ({host}:{port}) is unreachable."
 _NOTIFY_RECOVERY_TITLE_EN = "Inverter back online"
 _NOTIFY_RECOVERY_MESSAGE_EN = "{name} ({host}:{port}) is back online."
+_NOTIFY_RECOVERY_MESSAGE_AFTER_EN = (
+    "{name} ({host}:{port}) is back online after {duration}."
+)
+# (hours, minutes) unit labels for the downtime shown in a recovery message.
+_NOTIFY_DURATION_UNITS_EN = ("h", "min")
 _LOCALIZED_NOTIFY_FAULT_TITLE: dict[str, str] = {
     "de": "Wechselrichter nicht erreichbar",
     "fr": "Onduleur injoignable",
@@ -107,6 +112,14 @@ _LOCALIZED_NOTIFY_FAULT_MESSAGE_NOW: dict[str, str] = {
 _LOCALIZED_NOTIFY_RECOVERY_TITLE: dict[str, str] = {
     "de": "Wechselrichter wieder erreichbar",
     "fr": "Onduleur de nouveau joignable",
+}
+_LOCALIZED_NOTIFY_RECOVERY_MESSAGE_AFTER: dict[str, str] = {
+    "de": "{name} ({host}:{port}) ist nach {duration} wieder online.",
+    "fr": "{name} ({host}:{port}) est de nouveau en ligne après {duration}.",
+}
+_LOCALIZED_NOTIFY_DURATION_UNITS: dict[str, tuple[str, str]] = {
+    "de": ("Std.", "Min."),
+    "fr": ("h", "min"),
 }
 _LOCALIZED_NOTIFY_RECOVERY_MESSAGE: dict[str, str] = {
     "de": "{name} ({host}:{port}) ist wieder online.",
@@ -159,6 +172,7 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         # in progress (if any) -- guards against re-notifying on every poll
         # and gates a recovery notification to episodes that were announced.
         self._fault_notified = False
+        self._fault_started: datetime | None = None
 
         super().__init__(
             hass,
@@ -486,6 +500,7 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
             title, message = self._fault_notification_text(snapshot)
             self._send_notification(mode, target, title, message)
             self._fault_notified = True
+            self._fault_started = snapshot.fault_since or dt_util.utcnow()
         elif snapshot.state is EngineState.ONLINE and self._fault_notified:
             # The recovery message reuses the fault notification's slot, so it
             # replaces the stale fault message; without it, remove that message.
@@ -535,17 +550,40 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         )
         return title, message
 
+    def _downtime_text(self, language: str) -> str | None:
+        """Return the announced fault's length, or None when under a minute."""
+        if self._fault_started is None:
+            return None
+        minutes = int((dt_util.utcnow() - self._fault_started).total_seconds() // 60)
+        if minutes < 1:
+            return None
+        hours, minutes = divmod(minutes, 60)
+        hour_unit, minute_unit = _LOCALIZED_NOTIFY_DURATION_UNITS.get(
+            language, _NOTIFY_DURATION_UNITS_EN
+        )
+        if hours:
+            return f"{hours} {hour_unit} {minutes} {minute_unit}"
+        return f"{minutes} {minute_unit}"
+
     def _recovery_notification_text(self) -> tuple[str, str]:
         language = self._notify_language()
         title = _LOCALIZED_NOTIFY_RECOVERY_TITLE.get(
             language, _NOTIFY_RECOVERY_TITLE_EN
         )
-        message = _LOCALIZED_NOTIFY_RECOVERY_MESSAGE.get(
-            language, _NOTIFY_RECOVERY_MESSAGE_EN
-        ).format(
+        duration = self._downtime_text(language)
+        if duration is None:
+            template = _LOCALIZED_NOTIFY_RECOVERY_MESSAGE.get(
+                language, _NOTIFY_RECOVERY_MESSAGE_EN
+            )
+        else:
+            template = _LOCALIZED_NOTIFY_RECOVERY_MESSAGE_AFTER.get(
+                language, _NOTIFY_RECOVERY_MESSAGE_AFTER_EN
+            )
+        message = template.format(
             name=self._entry.data.get(CONF_DEVICE_NAME, DEFAULT_DEVICE_NAME),
             host=self._host,
             port=self._port,
+            duration=duration,
         )
         return title, message
 
