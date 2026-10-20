@@ -1,7 +1,7 @@
 # SolarMax for Home Assistant
 
 [![Validate](https://github.com/ludgerbeckmann/ha_solarmax/actions/workflows/validate.yml/badge.svg)](https://github.com/ludgerbeckmann/ha_solarmax/actions/workflows/validate.yml)
-[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
+[![HACS](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz)
 [![GitHub release](https://img.shields.io/github/release/ludgerbeckmann/ha_solarmax.svg)](https://github.com/ludgerbeckmann/ha_solarmax/releases/)
 [![GitHub license](https://img.shields.io/github/license/ludgerbeckmann/ha_solarmax.svg)](https://github.com/ludgerbeckmann/ha_solarmax/blob/main/LICENSE)
 
@@ -64,14 +64,14 @@ change after setup.
 
 ### HACS
 
-1. Open HACS and select **Integrations**.
-2. Open the menu and select **Custom repositories**.
-3. Add `https://github.com/ludgerbeckmann/ha_solarmax` as an
-   **Integration** repository.
-4. Search for **SolarMax** and install it.
-5. Restart Home Assistant.
+1. Open HACS and search for **SolarMax**.
+2. Select it and download it.
+3. Restart Home Assistant.
 
-HACS handles updates after the custom repository has been added.
+HACS handles updates. If SolarMax does not show up in the search yet (the
+default list can lag behind by a few hours), add
+`https://github.com/ludgerbeckmann/ha_solarmax` as a custom **Integration**
+repository from the HACS menu instead.
 
 ### Manual installation
 

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.9] - 2026-10-20
+
+### Changed
+
+- README: the integration is now part of the HACS default catalog, so the
+  install section leads with searching for SolarMax in HACS; the custom
+  repository step is kept only as a fallback. The HACS badge says "Default".
+
 ## [0.11.8] - 2026-10-18
 
 ### Changed
@@ -594,7 +602,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.8...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.9...HEAD
+[0.11.9]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.8...v0.11.9
 [0.11.8]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.7...v0.11.8
 [0.11.7]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.6...v0.11.7
 [0.11.6]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.5...v0.11.6
