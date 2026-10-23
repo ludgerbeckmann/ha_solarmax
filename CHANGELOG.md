@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.10] - 2026-10-23
+
+### Changed
+
+- A fault that starts before the inverter was online for the first time after
+  a Home Assistant restart is now announced only after the five-minute
+  threshold, even with "immediate" timing. The inverter often still holds the
+  previous connection for about two minutes after a restart, which used to
+  trigger a fault and a recovery message within seconds of each other.
+
 ## [0.11.9] - 2026-10-20
 
 ### Changed
@@ -602,7 +612,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.9...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.10...HEAD
+[0.11.10]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.9...v0.11.10
 [0.11.9]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.8...v0.11.9
 [0.11.8]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.7...v0.11.8
 [0.11.7]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.6...v0.11.7

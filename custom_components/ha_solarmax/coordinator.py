@@ -173,6 +173,9 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         # and gates a recovery notification to episodes that were announced.
         self._fault_notified = False
         self._fault_started: datetime | None = None
+        # A fault before the first online poll is usually the inverter still
+        # holding the pre-restart connection, so it is never announced at once.
+        self._seen_online = False
 
         super().__init__(
             hass,
@@ -486,6 +489,8 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
         returns -- so a None-to-set transition on `fault_since` reliably
         marks the start of a new episode.
         """
+        if snapshot.state is EngineState.ONLINE:
+            self._seen_online = True
         previous_fault_since = self.data.fault_since if self.data else None
         if snapshot.fault_since is not None and previous_fault_since is None:
             self._fault_notified = False
@@ -511,10 +516,9 @@ class SolarmaxCoordinator(DataUpdateCoordinator[EngineSnapshot]):
                 self._clear_notification(mode, target)
             self._fault_notified = False
 
-    @staticmethod
-    def _fault_notification_due(snapshot: EngineSnapshot, timing: str) -> bool:
+    def _fault_notification_due(self, snapshot: EngineSnapshot, timing: str) -> bool:
         """Return whether a fault notification is due under the given timing."""
-        if timing == NOTIFY_TIMING_IMMEDIATE:
+        if timing == NOTIFY_TIMING_IMMEDIATE and self._seen_online:
             return True
         if snapshot.fault_since is None:
             return False

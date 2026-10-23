@@ -255,7 +255,9 @@ serves as that shared default.
 
 **Notification timing** chooses between notifying as soon as the fault is
 classified, or waiting five minutes (matching the repair issue's own
-threshold) to skip brief blips. Each inverter has a single notification slot:
+threshold) to skip brief blips. A fault right after a Home Assistant restart,
+before the inverter has been online once, always waits the five minutes. Each
+inverter has a single notification slot:
 when the fault clears, the "unreachable" message is removed again (for push
 notifications via the Companion App's `clear_notification` with a per-inverter
 tag, for persistent ones by dismissing it). With **Notify when back online**
