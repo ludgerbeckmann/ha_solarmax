@@ -68,9 +68,9 @@ Releases happen automatically:
    and moves the Unreleased changelog notes into a dated section).
 2. Commit and push (or merge a PR) to `main`.
 3. The `Auto Release` workflow detects the changed `manifest.json`, and if
-   no tag for that version exists yet, builds `ha_solarmax.zip`, creates the
-   `vX.Y.Z` tag, and publishes a GitHub release with GitHub's automatically
-   generated notes (from merged PRs and commits since the last release).
+   no tag for that version exists yet, creates the `vX.Y.Z` tag and publishes
+   a GitHub release whose notes come from the matching `CHANGELOG.md`
+   section. No archive is attached; HACS installs from the tag.
 
 No manual steps on GitHub are required. Pushing a version bump straight to
 `main` publishes the release immediately, so only push once you're ready.

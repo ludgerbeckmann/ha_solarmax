@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.11] - 2026-11-08
+
+### Changed
+
+- README: tidied for the Home Assistant Marketplace page, which already shows
+  the title, version and requirements. The duplicate heading and the release
+  and HACS badges are removed, the outdated note about the HACS store icon and
+  the custom repository fallback are dropped, and the install steps mention
+  that HACS is called Marketplace from Home Assistant 2026.11.
+- README: manual installation no longer refers to a `ha_solarmax.zip` release
+  asset, which is not published; it uses the release's source archive.
+- CONTRIBUTING: the release description now matches the workflow (notes from
+  the changelog, no attached archive).
+
 ## [0.11.10] - 2026-10-23
 
 ### Changed
@@ -612,7 +626,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.10...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.11...HEAD
+[0.11.11]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.10...v0.11.11
 [0.11.10]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.9...v0.11.10
 [0.11.9]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.8...v0.11.9
 [0.11.8]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.7...v0.11.8

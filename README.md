@@ -1,8 +1,4 @@
-# SolarMax for Home Assistant
-
 [![Validate](https://github.com/ludgerbeckmann/ha_solarmax/actions/workflows/validate.yml/badge.svg)](https://github.com/ludgerbeckmann/ha_solarmax/actions/workflows/validate.yml)
-[![HACS](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz)
-[![GitHub release](https://img.shields.io/github/release/ludgerbeckmann/ha_solarmax.svg)](https://github.com/ludgerbeckmann/ha_solarmax/releases/)
 [![GitHub license](https://img.shields.io/github/license/ludgerbeckmann/ha_solarmax.svg)](https://github.com/ludgerbeckmann/ha_solarmax/blob/main/LICENSE)
 
 SolarMax connects Home Assistant directly to a SolarMax inverter over
@@ -37,8 +33,7 @@ You need:
 
 The integration icon ships inside the integration (`brand/icon.png`) and is
 shown by Home Assistant 2026.3 or newer. Older versions show a generic
-placeholder instead, which does not affect any function. The HACS store lists
-the icon only once HACS itself supports local brand images.
+placeholder instead, which does not affect any function.
 
 ### Supported inverters
 
@@ -64,21 +59,19 @@ change after setup.
 
 ### HACS
 
-1. Open HACS and search for **SolarMax**.
+1. Open HACS (called **Marketplace** from Home Assistant 2026.11) and search
+   for **SolarMax**.
 2. Select it and download it.
 3. Restart Home Assistant.
 
-HACS handles updates. If SolarMax does not show up in the search yet (the
-default list can lag behind by a few hours), add
-`https://github.com/ludgerbeckmann/ha_solarmax` as a custom **Integration**
-repository from the HACS menu instead.
+HACS handles updates.
 
 ### Manual installation
 
-1. Download `ha_solarmax.zip` from the latest
+1. Download the source archive (**Source code (zip)**) of the latest
    [GitHub release](https://github.com/ludgerbeckmann/ha_solarmax/releases/).
-2. Create `custom_components/ha_solarmax` in the Home Assistant configuration
-   directory and extract the archive there.
+2. Copy the `custom_components/ha_solarmax` folder from the archive into the
+   `custom_components` folder of your Home Assistant configuration directory.
 3. Confirm that `custom_components/ha_solarmax/manifest.json` exists.
 4. Restart Home Assistant.
 
