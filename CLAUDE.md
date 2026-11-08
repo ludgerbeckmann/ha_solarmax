@@ -75,8 +75,8 @@ sorgfältig, keine funktionalen Bugs gefunden.
 geänderter `custom_components/ha_solarmax/manifest.json` prüft der Workflow,
 ob der Tag `vX.Y.Z` (aus der Manifest-Version) schon existiert. Falls nicht:
 erstellt den Tag, veröffentlicht den Release **direkt**
-(kein Draft) mit GitHub-automatisch-generierten Release Notes
-(`generate_release_notes: true`, nicht aus CHANGELOG.md).
+(kein Draft); die Release Notes stammen aus dem passenden Abschnitt der
+CHANGELOG.md, es wird kein Archiv angehängt (HACS installiert aus dem Tag).
 
 Ablauf für eine neue Version:
 
