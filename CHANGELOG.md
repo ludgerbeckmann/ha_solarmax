@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.12] - 2026-11-26
+
+### Changed
+
+- Repository hardening: the Validate workflow runs with read-only token
+  permissions, the release action is pinned to a fixed commit, Dependabot
+  proposes updates for GitHub Actions weekly, and `SECURITY.md` describes how
+  to report a vulnerability privately. No change to the integration itself.
+
 ## [0.11.11] - 2026-11-08
 
 ### Changed
@@ -626,7 +635,8 @@ Initial release of this integration under `ludgerbeckmann/ha_solarmax`.
 - Native reconfiguration and repair flows in Home Assistant.
 - English, German, and French translations.
 
-[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.11...HEAD
+[Unreleased]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.12...HEAD
+[0.11.12]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.11...v0.11.12
 [0.11.11]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.10...v0.11.11
 [0.11.10]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.9...v0.11.10
 [0.11.9]: https://github.com/ludgerbeckmann/ha_solarmax/compare/v0.11.8...v0.11.9
